@@ -1,13 +1,14 @@
+import AppCore
 import Configuration
 
-/// Runtime defaults for driving the Assay CLI, resolved from configuration.
-///
-/// Plain `Sendable` data so any consumer (services, requests) can read the same
-/// resolved values synchronously.
-public struct AppConfiguration: Sendable {
-    public init() {}
+extension AppConfiguration {
+    public init(config: ConfigReader) {
+        self.init(
+            format: FormatConfiguration(config: config.scoped(to: .format))
+        )
+    }
+}
 
-    /// Reads the settings from a configuration reader.
-    /// - Parameter config: The configuration Reader
-    public init(config: ConfigReader) {}
+extension ConfigKey {
+    fileprivate static let format: ConfigKey = .init(["format"])
 }

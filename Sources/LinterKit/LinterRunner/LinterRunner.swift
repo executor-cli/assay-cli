@@ -1,5 +1,5 @@
-import ExecutorCore
 import Foundation
+import Path
 
 protocol LinterRunner {
     func execute(

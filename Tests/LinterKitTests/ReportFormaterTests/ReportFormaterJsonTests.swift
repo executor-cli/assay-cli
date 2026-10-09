@@ -1,10 +1,3 @@
-//
-//  ReportFormaterJsonTests.swift
-//  executor
-//
-//  Created by unit tests
-//
-import ExecutorCore
 import Foundation
 import Path
 import XCTest

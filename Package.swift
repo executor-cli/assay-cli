@@ -34,8 +34,12 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
+            name: "AppCore"
+        ),
+        .target(
             name: "App",
             dependencies: [
+                .target(name: "AppCore"),
                 .target(name: "AppConfiguration"),
                 .product(name: "CascadeKit", package: "cascade-kit")
             ]
@@ -43,31 +47,35 @@ let package = Package(
         .target(
             name: "AppConfiguration",
             dependencies: [
+                .target(name: "AppCore"),
                 .product(name: "Configuration", package: "swift-configuration")
             ]
         ),
         .testTarget(
             name: "AppTests",
             dependencies: [
-                "App",
-                "AppConfiguration",
+                .target(name: "App"),
+                .target(name: "AppConfiguration"),
                 .product(name: "CascadeKit", package: "cascade-kit")
             ]
         ),
         .testTarget(
             name: "AppConfigurationTests",
             dependencies: [
-                "AppConfiguration",
+                .target(name: "AppConfiguration"),
                 .product(name: "Configuration", package: "swift-configuration")
             ]
         ),
         .executableTarget(
             name: "AssayCLI",
             dependencies: [
-                "App",
-                "AppConfiguration",
+                .target(name: "App"),
+                .target(name: "AppConfiguration"),
+                .target(name: "AppCore"),
+                .target(name: "FormatKit"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                .product(name: "CascadeKit", package: "cascade-kit")
+                .product(name: "CascadeKit", package: "cascade-kit"),
+                .product(name: "Path", package: "Path")
             ],
             swiftSettings: [
                 .enableUpcomingFeature("ApproachableConcurrency")
@@ -83,16 +91,23 @@ let package = Package(
         .target(
             name: "FormatKit",
             dependencies: [
+                .target(name: "AppCore"),
                 .product(name: "SwiftFormat", package: "SwiftFormat"),
                 .product(name: "Path", package: "Path")
             ]
         ),
         .testTarget(
-            name: "FormatKitTests"
+            name: "FormatKitTests",
+            dependencies: [
+                .target(name: "FormatKit"),
+                .target(name: "AppCore"),
+                .product(name: "Path", package: "Path")
+            ]
         ),
         .target(
             name: "LinterKit",
             dependencies: [
+                .target(name: "AppCore"),
                 .product(name: "SwiftLintFramework", package: "SwiftLint"),
                 .product(name: "Path", package: "Path"),
                 .product(name: "NIOSSL", package: "swift-nio-ssl")

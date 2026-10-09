@@ -1,3 +1,4 @@
+import AppCore
 import Configuration
 import Foundation
 import SystemPackage
@@ -11,6 +12,12 @@ import SystemPackage
 public enum ConfigurationLoader {
     /// Default config file name, looked up in the current working directory.
     private static let defaultConfigFileName = "assay-cli.json"
+
+    /// Resolves the feature flags from the environment layered over an optional
+    /// JSON config file (env wins). The file provider is asynchronous, hence `async`.
+    public static func resolve() async -> AppConfiguration {
+        await AppConfiguration(config: configReader())
+    }
 
     /// Builds a `ConfigReader` from the environment (highest precedence) layered
     /// over an optional JSON config file.

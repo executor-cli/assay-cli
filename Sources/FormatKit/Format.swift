@@ -1,25 +1,31 @@
+import AppCore
 import Foundation
 import Path
-import SwiftFormat
+@preconcurrency import SwiftFormat
 
 /// The formatter executor
 public enum Formatter {
-    /// Folder names that are always excluded from formatting.
-    /// `.build` is SPM's output directory; `DerivedData` is Xcode's.
-    static let defaultExcludes: [String] = [".build", "DerivedData"]
+    public enum Factory {
+        public static var `default`: any FormatterService {
+            FormatterServiceSwiftFormat(formatterProvider: FormatterProviderSwiftFormat())
+        }
+    }
+}
 
-    /// Run format executor
-    /// - Parameters:
-    ///   - paths: The folders or files to be formatted
-    ///   - swiftVersion: The swift version
-    ///   - exclude: Additional folder names or paths to skip. Combined with the built-in defaults
-    ///              (`.build`, `DerivedData`). Values are passed through to SwiftFormat's native
-    ///              `--exclude` argument.
-    public static func format(
+public protocol FormatterService: Sendable {
+    func format(
         _ paths: [AbsolutePath],
-        swiftVersion: String,
-        exclude: [String] = []
-    ) throws {
+        configuration: AppConfiguration,
+        exclude: [String]
+    ) throws
+}
+
+protocol FormatterProvider: Sendable {
+    func format(_ paths: [AbsolutePath], args: String)
+}
+
+struct FormatterProviderSwiftFormat: FormatterProvider {
+    func format(_ paths: [AbsolutePath], args: String) {
         SwiftFormat.CLI.print = { (output: String, type: SwiftFormat.CLI.OutputType) in
             guard let data = output
                 .appending("\n")
@@ -33,8 +39,6 @@ public enum Formatter {
             }
         }
 
-        let args = makeArguments(swiftVersion: swiftVersion, exclude: exclude)
-
         for path in paths {
             _ = SwiftFormat.CLI.run(
                 in: path.pathString,
@@ -42,10 +46,33 @@ public enum Formatter {
             )
         }
     }
+}
 
-    static func makeArguments(swiftVersion: String, exclude: [String]) -> String {
+struct FormatterServiceSwiftFormat: FormatterService {
+    private let formatterProvider: any FormatterProvider
+
+    init(formatterProvider: any FormatterProvider) {
+        self.formatterProvider = formatterProvider
+    }
+
+    func format(
+        _ paths: [AbsolutePath],
+        configuration: AppConfiguration,
+        exclude: [String]
+    ) throws {
+        let excludeMerge = configuration.format.defaultExcludes.merging(exclude)
+
+        let args = makeArguments(
+            swiftVersion: configuration.format.swiftVersion,
+            exclude: excludeMerge
+        )
+
+        formatterProvider.format(paths, args: args)
+    }
+
+    private func makeArguments(swiftVersion: String, exclude: [String]) -> String {
         var combined: [String] = []
-        for value in defaultExcludes + exclude where !combined.contains(value) {
+        for value in exclude where !combined.contains(value) {
             combined.append(value)
         }
         let excludeArg = "--exclude " + combined.joined(separator: ",")

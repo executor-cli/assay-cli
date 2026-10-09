@@ -1,5 +1,5 @@
-import ExecutorCore
 import Foundation
+import Path
 @testable import LinterKit
 
 final class LinterServiceMock: LinterService {

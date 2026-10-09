@@ -35,12 +35,14 @@ struct LinterServiceSwiftLint: LinterService {
         let ruleRegistry = RuleRegistry.shared
         ruleRegistry.register(rules: builtInRules + coreRules)
 
+        let resolvedConfigURL = URL(fileURLWithPath: resolvedConfigPath)
+
         let configuration: Configuration
         if configFilePath != nil {
-            configuration = Configuration(configurationFiles: [resolvedConfigPath])
+            configuration = Configuration(configurationFiles: [resolvedConfigURL])
         } else {
             let parentConfiguration = Configuration(
-                configurationFiles: [resolvedConfigPath]
+                configurationFiles: [resolvedConfigURL]
             )
             configuration = try Configuration(
                 parentConfiguration: parentConfiguration,
@@ -52,9 +54,9 @@ struct LinterServiceSwiftLint: LinterService {
 
         let swiftFiles = paths.flatMap {
             configuration.lintableFiles(
-                inPath: $0.pathString,
+                inPath: URL(fileURLWithPath: $0.pathString),
                 forceExclude: false,
-                excludeBy: .paths(excludedPaths: configuration.excludedPaths())
+                excludeByPrefix: false
             )
         }
 
@@ -85,8 +87,9 @@ struct LinterServiceSwiftLint: LinterService {
     }
 
     private static func generateFingerprint(_ violation: StyleViolation) -> String {
+        let relativeFile = violation.location.file.map { URL(fileURLWithPath: $0.relativeDisplayPath) }
         let fingerprintLocation = Location(
-            file: violation.location.relativeFile,
+            file: relativeFile,
             line: violation.location.line,
             character: violation.location.character
         )
@@ -121,7 +124,7 @@ struct LinterServiceSwiftLint: LinterService {
                         begin: violation.location.line,
                         end: violation.location.line
                     ),
-                    path: violation.location.relativeFile
+                    path: violation.location.file?.relativeDisplayPath
                 )
             )
         }
@@ -131,7 +134,7 @@ struct LinterServiceSwiftLint: LinterService {
         violations.map { violation in
             SwiftLintFile(
                 character: violation.location.character,
-                file: violation.location.file,
+                file: violation.location.file?.path,
                 line: violation.location.line,
                 reason: violation.reason,
                 rule_id: violation.ruleIdentifier,

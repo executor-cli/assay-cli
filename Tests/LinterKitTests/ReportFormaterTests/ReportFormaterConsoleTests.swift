@@ -1,6 +1,6 @@
 import Foundation
+import Path
 import XCTest
-@testable import ExecutorCore
 @testable import LinterKit
 
 final class ReportFormaterConsoleTests: XCTestCase {

@@ -1,5 +1,5 @@
 import Testing
-@testable import assay
+@testable import AssayCLI
 
 @Test
 func example() {
