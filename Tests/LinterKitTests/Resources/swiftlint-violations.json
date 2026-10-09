@@ -1,0 +1,29 @@
+[
+  {
+    "character": 8,
+    "file": "/Users/test/project/Sources/MyClass.swift",
+    "line": 15,
+    "reason": "Missing documentation for public function 'myFunction'",
+    "rule_id": "missing_docs",
+    "severity": "warning",
+    "type": "Documentation"
+  },
+  {
+    "character": 14,
+    "file": "/Users/test/project/Sources/AnotherClass.swift",
+    "line": 42,
+    "reason": "Missing documentation for public class 'AnotherClass'",
+    "rule_id": "missing_docs",
+    "severity": "error",
+    "type": "Documentation"
+  },
+  {
+    "character": null,
+    "file": null,
+    "line": null,
+    "reason": "Missing documentation for public property 'myProperty'",
+    "rule_id": "missing_docs",
+    "severity": "warning",
+    "type": "Documentation"
+  }
+]

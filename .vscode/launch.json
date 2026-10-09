@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:static-analyser-cli}",
+      "name": "Debug AssayCLI",
+      "target": "AssayCLI",
+      "configuration": "debug",
+      "preLaunchTask": "swift: Build Debug AssayCLI"
+    },
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:static-analyser-cli}",
+      "name": "Release AssayCLI",
+      "target": "AssayCLI",
+      "configuration": "release",
+      "preLaunchTask": "swift: Build Release AssayCLI"
+    }
+  ]
+}

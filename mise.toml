@@ -1,0 +1,195 @@
+# mise tasks for building and installing assay.
+#   mise run build        # release build
+#   mise run install      # build + install to ~/.local/bin (per-user, no sudo)
+#   mise run setup-path   # optionally add ~/.local/bin to your shell PATH
+#   mise run mcp-add      # register the installed binary with Claude Code
+#   mise tasks            # list everything
+
+[tools]
+# Swift toolchain — provisioned by mise so CI works on Linux (where ubuntu
+# runners ship no Swift) as well as macOS.
+swift = "6.1.1"
+# executor-cli powers the CI lint/format/coverage tasks (provisioned by mise in CI).
+"github:executor-cli/executor" = "0.28.2"
+
+[env]
+# Per-user install prefix — the best-practice location for user binaries
+# (no sudo, doesn't touch the rest of the machine). Override with INSTALL_DIR=...
+INSTALL_DIR = "{{ env.HOME }}/.local/bin"
+# Installed command name (the Swift product is AssayCLI).
+BIN_NAME = "assay"
+# Make the install dir visible on PATH inside this project's mise environment,
+# so the freshly-installed binary resolves without touching your shell profile.
+_.path = ["{{ env.HOME }}/.local/bin"]
+
+[tasks.build]
+description = "Build the release binary"
+run = "swift build -c release"
+
+[tasks.build-release]
+description = "Build release binary and rename for distribution (used by CI)"
+usage = '''
+flag "--arch <arch>" help="Target architecture, e.g. arm64 or x86_64 (empty = host)." default=""
+'''
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+# Linux has no ABI-stable system Swift runtime; link it in so the tarball runs anywhere.
+if [ "$(uname -s)" = "Linux" ]; then STATIC="--static-swift-stdlib"; else STATIC=""; fi
+swift build -c release --disable-sandbox $STATIC ${usage_arch:+--arch "$usage_arch"}
+BIN_DIR=$(swift build -c release --show-bin-path --disable-sandbox ${usage_arch:+--arch "$usage_arch"})
+mkdir -p .build/release
+cp "$BIN_DIR/AssayCLI" ".build/release/$BIN_NAME"
+'''
+
+[tasks.release]
+description = "Run semantic-release. Use --dry-run to preview without publishing."
+usage = '''
+flag "-d --dry-run" help="Preview the release without publishing (no tag, no commit, no GitHub Release)"
+flag "--write-change-log" help="Enable writing a changelog"
+flag "--skip-ci/--no-skip-ci" help="Skip CI (default: --skip-ci)" default="true"
+flag "--verbose" help="Enable verbose mode"
+'''
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+
+dry_run_opt=""
+if [[ "${usage_dry_run:-}" == "true" ]]; then
+    dry_run_opt="--dry-run"
+fi
+
+enable_changelog_opt=""
+if [[ "${usage_write_change_log:-}" == "true" ]]; then
+    enable_changelog_opt="--write-change-log"
+fi
+
+enable_verbose_opt=""
+if [[ "${usage_verbose:-}" == "true" ]]; then
+    enable_verbose_opt="--verbose"
+fi
+
+skip_ci_opt="--skip-ci"
+if [[ "${usage_skip_ci:-}" == "false" ]]; then
+    skip_ci_opt="--no-skip-ci"
+fi
+
+executor release package $dry_run_opt $enable_changelog_opt $enable_verbose_opt $skip_ci_opt --current-directory .
+'''
+
+[tasks.test]
+description = "Run the test suite (cross-platform)"
+run = "swift test"
+
+# --- Tasks consumed by amine2233/ci-shared (keep these names stable) ---
+
+[tasks.format]
+description = "Format the code using SwiftFormat (executor)"
+run = "executor format ."
+
+[tasks.check_code]
+description = "Lint source code (executor)"
+run = "executor linting code ./Sources --reporter console"
+
+[tasks.check_documentation]
+description = "Lint code documentation (executor)"
+run = "executor linting documentation ./Sources --reporter console"
+
+[tasks.check_merge_request_title]
+description = "Lint the pull request title and post the result as a PR comment."
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+# ponytail: executor expects CI_MERGE_REQUEST_TITLE (GitLab-style), simulate it from GitHub API
+export CI_MERGE_REQUEST_TITLE=$(gh pr view "${COMMENT_TARGET?}" --json title -q .title)
+executor check-ci merge-request-title --post-comment --comment-token "${GITHUB_TOKEN?}" --comment-target "${COMMENT_TARGET?}"
+'''
+
+[tasks.lint]
+description = "Run all static checks (code + documentation) — used by CI's lint job"
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+# ponytail: executor format has no --lint flag, so format then diff the diff
+before=$(git diff)
+executor format .
+if [[ "$before" != "$(git diff)" ]]; then
+    git diff
+    echo "❌ formatting changed files — commit the result of 'mise format'" >&2
+    exit 1
+fi
+executor linting code ./Sources --reporter console
+executor linting documentation ./Sources --reporter console
+'''
+
+[tasks.test-coverage]
+description = "Run tests with coverage (macOS only; used by CI when coverage is enabled)"
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+executor swift test --enable-code-coverage
+executor test report --report-for-type swift ./
+executor coverage swift --verbose
+'''
+
+[tasks.run]
+description = "Run the CLI (pass args after --)"
+run = "swift run AssayCLI"
+
+[tasks.install]
+description = "Build (release) and install assay to a bin dir (default: ~/.local/bin)"
+depends = ["build"]
+usage = '''
+flag "--bin-path <dir>" help="Target directory (default: $INSTALL_DIR, i.e. ~/.local/bin)"
+'''
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+# Priority: --bin-path flag > $INSTALL_DIR env > ~/.local/bin
+DIR="${usage_bin_path:-${INSTALL_DIR:-$HOME/.local/bin}}"
+mkdir -p "$DIR"
+BIN="$(swift build -c release --show-bin-path)/AssayCLI"
+install -m 0755 "$BIN" "$DIR/$BIN_NAME"
+echo "Installed $BIN_NAME -> $DIR/$BIN_NAME"
+case ":${PATH}:" in
+  *":$DIR:"*) ;;
+  *) echo "note: $DIR is not on your PATH — run 'mise run setup-path' (for ~/.local/bin) or add it manually" ;;
+esac
+'''
+
+[tasks.uninstall]
+description = "Remove assay from a bin dir (default: ~/.local/bin)"
+usage = '''
+flag "--bin-path <dir>" help="Directory to remove from (default: $INSTALL_DIR, i.e. ~/.local/bin)"
+'''
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+DIR="${usage_bin_path:-${INSTALL_DIR:-$HOME/.local/bin}}"
+rm -f "$DIR/$BIN_NAME"
+echo "Removed $DIR/$BIN_NAME"
+'''
+
+[tasks.setup-path]
+description = "Optionally add ~/.local/bin to PATH in your shell profile (idempotent)"
+run = '''
+set -e
+case "$(basename "${SHELL:-/bin/zsh}")" in
+  zsh)  PROFILE="$HOME/.zshrc" ;;
+  bash) PROFILE="$HOME/.bashrc" ;;
+  *)    PROFILE="$HOME/.profile" ;;
+esac
+LINE='export PATH="$HOME/.local/bin:$PATH"'
+if [ -f "$PROFILE" ] && grep -qF "$LINE" "$PROFILE"; then
+  echo "$PROFILE already puts ~/.local/bin on PATH"
+else
+  printf '\n# Added by assay (mise run setup-path)\n%s\n' "$LINE" >> "$PROFILE"
+  echo "Added ~/.local/bin to PATH in $PROFILE"
+  echo "Restart your shell or run: source $PROFILE"
+fi
+'''
+
+[tasks.mcp-add]
+description = "Register the installed binary with Claude Code (user scope)"
+depends = ["install"]
+run = 'claude mcp add assay -- "$INSTALL_DIR/$BIN_NAME" serve'

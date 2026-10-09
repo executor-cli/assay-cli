@@ -1,0 +1,15 @@
+# Add any folder to exclude.
+excluded:
+  - ${PWD}/Tests
+  - ${PWD}/xcodebuilds
+  - ${PWD}/.xcodebuilds
+  - ${PWD}/bundle
+  - ${PWD}/build
+  - ${PWD}/.build
+  - ${PWD}/.swiftpm
+
+included:
+  - ${PWD}/Sources
+
+only_rules:
+  - missing_docs

@@ -1,0 +1,47 @@
+[
+  {
+    "type": "issue",
+    "check_name": "missing_docs",
+    "description": "Missing documentation for public function 'myFunction'",
+    "engine_name": "SwiftLint",
+    "fingerprint": "abc123def456",
+    "severity": "minor",
+    "location": {
+      "path": "/Users/test/project/Sources/MyClass.swift",
+      "lines": {
+        "begin": 15,
+        "end": 15
+      }
+    }
+  },
+  {
+    "type": "issue",
+    "check_name": "missing_docs",
+    "description": "Missing documentation for public class 'AnotherClass'",
+    "engine_name": "SwiftLint",
+    "fingerprint": "xyz789ghi012",
+    "severity": "major",
+    "location": {
+      "path": "/Users/test/project/Sources/AnotherClass.swift",
+      "lines": {
+        "begin": 42,
+        "end": 42
+      }
+    }
+  },
+  {
+    "type": "issue",
+    "check_name": "missing_docs",
+    "description": "Missing documentation for public property 'myProperty'",
+    "engine_name": "SwiftLint",
+    "fingerprint": "mno345pqr678",
+    "severity": "minor",
+    "location": {
+      "path": null,
+      "lines": {
+        "begin": 1,
+        "end": 1
+      }
+    }
+  }
+]
