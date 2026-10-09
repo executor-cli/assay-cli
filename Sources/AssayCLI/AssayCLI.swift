@@ -18,7 +18,8 @@ struct AssayCLI: AsyncParsableCommand {
             abstract: "A assay helper usable as a CLI.",
             version: appVersion,
             subcommands: [
-                FormatCommand.self
+                FormatCommand.self,
+                LinterCommand.self
             ]
         )
     }

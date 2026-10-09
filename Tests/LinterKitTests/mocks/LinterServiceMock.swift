@@ -2,7 +2,7 @@ import Foundation
 import Path
 @testable import LinterKit
 
-final class LinterServiceMock: LinterService {
+final class LinterServiceMock: LinterService, @unchecked Sendable {
     // MARK: - execute
 
     var executeCallsCount = 0

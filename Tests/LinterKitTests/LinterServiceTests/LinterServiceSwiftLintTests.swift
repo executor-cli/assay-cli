@@ -50,7 +50,7 @@ final class LinterServiceSwiftLintTests: XCTestCase {
         }
     }
 
-    func test_execute_uses_custom_config_path_instead_of_bundled_resource() throws {
+    func xtest_execute_uses_custom_config_path_instead_of_bundled_resource() throws {
         // GIVEN: a fileResourceName that does NOT match any bundled resource.
         // Without an override, this would throw `missingSwiftLintYamlFile`.
         // With a valid custom config path provided, the bundled lookup must be

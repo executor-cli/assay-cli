@@ -9,3 +9,4 @@ DerivedData/
 .netrc
 .envrc
 .env*
+mise.local.toml

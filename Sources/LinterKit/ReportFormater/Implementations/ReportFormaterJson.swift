@@ -1,25 +1,26 @@
+import CascadeKit
 import Foundation
 import Path
 
 struct ReportFormaterJson: ReportFormater {
     private let fileName: String
     private let outputURL: AbsolutePath
-    private let fileManager: CreateFileService
-    private let printer: any Printer
     private let runnerName: String?
 
+    @Dependency(\.createFileService)
+    private var fileManager: CreateFileService
+
+    @Dependency(\.printer)
+    private var printer: any Printer
+
     init(
-        printer: any Printer,
         runnerName: String? = nil,
         fileName: String = .documentationReportFileName,
-        outputURL: AbsolutePath = .currentWorkingDirectory,
-        fileManager: CreateFileService = FileManager.default
+        outputURL: AbsolutePath = .currentWorkingDirectory
     ) {
-        self.printer = printer
         self.runnerName = runnerName
         self.fileName = fileName
         self.outputURL = outputURL
-        self.fileManager = fileManager
     }
 
     func report(from data: Data, verbose: Bool) throws {

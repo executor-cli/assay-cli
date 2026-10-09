@@ -10,7 +10,7 @@
 # runners ship no Swift) as well as macOS.
 swift = "6.1.1"
 # executor-cli powers the CI lint/format/coverage tasks (provisioned by mise in CI).
-"github:executor-cli/executor" = "0.28.2"
+"github:executor-cli/executor" = "0.28.5"
 
 [env]
 # Per-user install prefix — the best-practice location for user binaries

@@ -1,8 +1,9 @@
 import Foundation
 import Path
 
-enum LinterServiceFactory {
-    static func swiftLint(
+public struct LinterServiceFactory: Sendable {
+    public init() {}
+    public func swiftLint(
         fileResourceName: String,
         additionalConfiguration: [String: Any] = [:],
         onlyRule: [String] = [],
@@ -19,7 +20,7 @@ enum LinterServiceFactory {
     }
 }
 
-protocol LinterService {
+public protocol LinterService: Sendable {
     func execute(
         forPaths paths: [AbsolutePath],
         reporter: LinterType,

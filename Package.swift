@@ -6,6 +6,9 @@ import PackageDescription
 let package = Package(
     name: "assay-cli",
     platforms: [.macOS(.v15)],
+    products: [
+        .executable(name: "assay", targets: ["AssayCLI"])
+    ],
     dependencies: [
         .package(url: "https://github.com/amine2233/cascade-kit.git", from: "1.0.0"),
         .package(
@@ -41,6 +44,8 @@ let package = Package(
             dependencies: [
                 .target(name: "AppCore"),
                 .target(name: "AppConfiguration"),
+                .target(name: "FormatKit"),
+                .target(name: "LinterKit"),
                 .product(name: "CascadeKit", package: "cascade-kit")
             ]
         ),
@@ -51,30 +56,11 @@ let package = Package(
                 .product(name: "Configuration", package: "swift-configuration")
             ]
         ),
-        .testTarget(
-            name: "AppTests",
-            dependencies: [
-                .target(name: "App"),
-                .target(name: "AppConfiguration"),
-                .product(name: "CascadeKit", package: "cascade-kit")
-            ]
-        ),
-        .testTarget(
-            name: "AppConfigurationTests",
-            dependencies: [
-                .target(name: "AppConfiguration"),
-                .product(name: "Configuration", package: "swift-configuration")
-            ]
-        ),
         .executableTarget(
             name: "AssayCLI",
             dependencies: [
                 .target(name: "App"),
-                .target(name: "AppConfiguration"),
-                .target(name: "AppCore"),
-                .target(name: "FormatKit"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                .product(name: "CascadeKit", package: "cascade-kit"),
                 .product(name: "Path", package: "Path")
             ],
             swiftSettings: [
@@ -93,7 +79,8 @@ let package = Package(
             dependencies: [
                 .target(name: "AppCore"),
                 .product(name: "SwiftFormat", package: "SwiftFormat"),
-                .product(name: "Path", package: "Path")
+                .product(name: "Path", package: "Path"),
+                .product(name: "CascadeKit", package: "cascade-kit")
             ]
         ),
         .testTarget(
@@ -110,7 +97,8 @@ let package = Package(
                 .target(name: "AppCore"),
                 .product(name: "SwiftLintFramework", package: "SwiftLint"),
                 .product(name: "Path", package: "Path"),
-                .product(name: "NIOSSL", package: "swift-nio-ssl")
+                .product(name: "NIOSSL", package: "swift-nio-ssl"),
+                .product(name: "CascadeKit", package: "cascade-kit")
             ],
             resources: [
                 .copy("Resources/lint-missing-docs.sh"),

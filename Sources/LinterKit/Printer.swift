@@ -1,3 +1,4 @@
+import CascadeKit
 import Foundation
 
 // MARK: - Protocol
@@ -23,13 +24,15 @@ struct ConsolePrinter: Printer {
     }
 }
 
-// MARK: - Factory
-
-/// Factory for creating printer instances.
-public enum PrinterFactory {
-    /// Creates and returns a printer instance.
-    /// - Returns: A printer that outputs to the console by default.
-    public static func create() -> Printer {
+struct ConsolePrinterKey: DependencyKey {
+    static var liveValue: Printer {
         ConsolePrinter()
+    }
+}
+
+extension DependencyValues {
+    var printer: Printer {
+        get { self[ConsolePrinterKey.self] }
+        set { self[ConsolePrinterKey.self] = newValue }
     }
 }

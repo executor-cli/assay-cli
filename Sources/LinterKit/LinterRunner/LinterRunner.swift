@@ -1,7 +1,7 @@
 import Foundation
 import Path
 
-protocol LinterRunner {
+public protocol LinterRunner: Sendable {
     func execute(
         forPaths paths: [AbsolutePath],
         throwError: Bool,
@@ -9,15 +9,16 @@ protocol LinterRunner {
     ) throws
 }
 
-enum LinterRunnerFactory {
-    static func build(
+public struct LinterRunnerFactory: Sendable {
+    public init() {}
+    public func build(
         reportFormater: ReportFormater,
         from type: LinterType,
-        service: any LinterService
+        linterSrvice: any LinterService
     ) -> any LinterRunner {
         LinterRunnerDefault(
             reportFormater: reportFormater,
-            service: service,
+            linterSrvice: linterSrvice,
             linterType: type
         )
     }

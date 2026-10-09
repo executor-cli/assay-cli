@@ -7,7 +7,7 @@ final class LinterServiceFactoryTests: XCTestCase {
 
     func test_factory_creates_swiftLint_service() {
         // WHEN
-        let service = LinterServiceFactory.swiftLint(fileResourceName: "test-config")
+        let service = LinterServiceFactory().swiftLint(fileResourceName: "test-config")
 
         // THEN
         XCTAssertTrue(service is LinterServiceSwiftLint)
@@ -19,7 +19,7 @@ final class LinterServiceFactoryTests: XCTestCase {
         customEncoder.outputFormatting = .prettyPrinted
 
         // WHEN
-        let service = LinterServiceFactory.swiftLint(
+        let service = LinterServiceFactory().swiftLint(
             fileResourceName: "test-config",
             jsonEncoder: customEncoder
         )
@@ -33,7 +33,7 @@ final class LinterServiceFactoryTests: XCTestCase {
         let additionalConfig = ["reporter": "json"]
 
         // WHEN
-        let service = LinterServiceFactory.swiftLint(
+        let service = LinterServiceFactory().swiftLint(
             fileResourceName: "test-config",
             additionalConfiguration: additionalConfig
         )
@@ -47,7 +47,7 @@ final class LinterServiceFactoryTests: XCTestCase {
         let rules = ["missing_docs"]
 
         // WHEN
-        let service = LinterServiceFactory.swiftLint(
+        let service = LinterServiceFactory().swiftLint(
             fileResourceName: "test-config",
             onlyRule: rules
         )
@@ -66,14 +66,14 @@ final class LinterServiceFactoryTests: XCTestCase {
 
         // WHEN & THEN
         for fileName in fileNames {
-            let service = LinterServiceFactory.swiftLint(fileResourceName: fileName)
+            let service = LinterServiceFactory().swiftLint(fileResourceName: fileName)
             XCTAssertTrue(service is LinterServiceSwiftLint)
         }
     }
 
     func test_factory_returns_protocol_type() {
         // WHEN
-        let service = LinterServiceFactory.swiftLint(fileResourceName: "test-config")
+        let service = LinterServiceFactory().swiftLint(fileResourceName: "test-config")
 
         // THEN
         XCTAssertTrue(service is any LinterService)
@@ -84,7 +84,7 @@ final class LinterServiceFactoryTests: XCTestCase {
         let configPath = "/tmp/custom.swiftlint.yml"
 
         // WHEN
-        let service = LinterServiceFactory.swiftLint(
+        let service = LinterServiceFactory().swiftLint(
             fileResourceName: "test-config",
             configFilePath: configPath
         )

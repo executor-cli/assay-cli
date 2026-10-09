@@ -1,35 +1,29 @@
 import Foundation
 import Path
 
-enum ReportFormaterFactory {
-    static func build(
+public struct ReportFormaterFactory: Sendable {
+    public init() {}
+
+    public func build(
         from type: LinterType,
-        printer: any Printer,
         runnerName: String? = nil,
         fileName: String = .codeQualityReportFileName,
-        reportsPath: AbsolutePath = .currentWorkingDirectory,
-        fileManager: CreateFileService = FileManager.default
+        reportsPath: AbsolutePath = .currentWorkingDirectory
     ) -> any ReportFormater {
         switch type {
         case .console:
-            ReportFormaterConsole(
-                printer: printer
-            )
+            ReportFormaterConsole()
         case .json:
             ReportFormaterJson(
-                printer: printer,
                 runnerName: runnerName,
                 fileName: fileName,
-                outputURL: reportsPath,
-                fileManager: fileManager
+                outputURL: reportsPath
             )
         case .codeQuality:
             ReportFormaterCodeQuality(
-                printer: printer,
                 runnerName: runnerName,
                 fileName: fileName,
-                outputURL: reportsPath,
-                fileManager: fileManager
+                outputURL: reportsPath
             )
         }
     }

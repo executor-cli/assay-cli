@@ -12,7 +12,7 @@ struct FormatCommand: ParsableCommand {
     )
 
     @Argument(
-        help: "Files to format",
+        help: "Files & Folders to format",
         completion: .directory
     )
     var paths: [AbsolutePath]
@@ -20,7 +20,7 @@ struct FormatCommand: ParsableCommand {
     @Option(
         name: [.customLong("exclude")],
         help: ArgumentHelp(
-            "Folder name or path to skip (repeatable).",
+            "Files and Folders name or path to skip (repeatable).",
             discussion: """
             Builds on the built-in defaults (.build, DerivedData). Pass multiple --exclude flags \
             to exclude multiple folders, e.g. --exclude Carthage --exclude Generated.
@@ -46,6 +46,10 @@ struct FormatCommand: ParsableCommand {
 
 extension AbsolutePath: @retroactive ExpressibleByArgument {
     public init?(argument: String) {
-        try? self.init(validating: argument)
+        guard let currentDirectory = try? AbsolutePath(validating: FileManager.default.currentDirectoryPath),
+              let resolved = try? AbsolutePath(validating: argument, relativeTo: currentDirectory)
+        else { return nil }
+
+        self = resolved
     }
 }

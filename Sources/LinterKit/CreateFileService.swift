@@ -1,9 +1,11 @@
+import CascadeKit
 import Foundation
+import SwiftLintFramework
 
 // MARK: Input Protocol
 
 /// Protocol for creating files in the file system.
-public protocol CreateFileService {
+public protocol CreateFileService: Sendable {
     /// Creates a file at the specified path with optional contents and file attributes.
     ///
     /// This method allows you to create a new file at the provided path, optionally specifying the file's
@@ -45,3 +47,16 @@ public protocol CreateFileService {
 // MARK: Conformance to CreateFolderService
 
 extension FileManager: CreateFileService {}
+
+struct CreateFileServiceKey: DependencyKey {
+    static var liveValue: CreateFileService {
+        FileManager.default
+    }
+}
+
+extension DependencyValues {
+    var createFileService: CreateFileService {
+        get { self[CreateFileServiceKey.self] }
+        set { self[CreateFileServiceKey.self] = newValue }
+    }
+}

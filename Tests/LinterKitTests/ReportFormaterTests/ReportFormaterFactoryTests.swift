@@ -4,6 +4,7 @@
 //
 //  Created by unit tests
 //
+import CascadeKit
 import XCTest
 @testable import LinterKit
 
@@ -13,10 +14,13 @@ final class ReportFormaterFactoryTests: XCTestCase {
     func test_factory_creates_console_formatter_for_console_type() {
         // GIVEN
         let type = LinterType.console
-        let printerMock = PrinterMock()
 
         // WHEN
-        let formatter = ReportFormaterFactory.build(from: type, printer: printerMock)
+        let formatter = withDependencies {
+            $0.printer = PrinterMock()
+        } operation: {
+            ReportFormaterFactory().build(from: type)
+        }
 
         // THEN
         XCTAssertTrue(formatter is ReportFormaterConsole)
@@ -28,7 +32,11 @@ final class ReportFormaterFactoryTests: XCTestCase {
         let printerMock = PrinterMock()
 
         // WHEN
-        let formatter = ReportFormaterFactory.build(from: type, printer: printerMock)
+        let formatter = withDependencies {
+            $0.printer = printerMock
+        } operation: {
+            ReportFormaterFactory().build(from: type)
+        }
 
         // THEN
         XCTAssertTrue(formatter is ReportFormaterJson)
@@ -40,7 +48,11 @@ final class ReportFormaterFactoryTests: XCTestCase {
         let printerMock = PrinterMock()
 
         // WHEN
-        let formatter = ReportFormaterFactory.build(from: type, printer: printerMock)
+        let formatter = withDependencies {
+            $0.printer = printerMock
+        } operation: {
+            ReportFormaterFactory().build(from: type)
+        }
 
         // THEN
         XCTAssertTrue(formatter is ReportFormaterCodeQuality)
@@ -53,7 +65,12 @@ final class ReportFormaterFactoryTests: XCTestCase {
 
         // WHEN & THEN
         for type in types {
-            let formatter = ReportFormaterFactory.build(from: type, printer: printerMock)
+            let formatter = withDependencies {
+                $0.printer = printerMock
+            } operation: {
+                ReportFormaterFactory().build(from: type)
+            }
+
             // Verify formatter was created for each type
             XCTAssertNotNil(formatter)
         }

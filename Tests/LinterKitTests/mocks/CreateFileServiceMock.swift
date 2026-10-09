@@ -2,7 +2,7 @@ import Foundation
 import Path
 @testable import LinterKit
 
-final class CreateFileServiceMock: CreateFileService {
+final class CreateFileServiceMock: CreateFileService, @unchecked Sendable {
     // MARK: - createFile
 
     var createFileAtPathContentsAttributesCallsCount = 0

@@ -1,3 +1,4 @@
+import CascadeKit
 import Foundation
 import Path
 import XCTest
@@ -20,10 +21,14 @@ final class ReportFormaterConsoleTests: XCTestCase {
         // GIVEN
         let emptyData = "[]".data(using: .utf8)!
         let mockPrinter = MockPrinter()
-        let formater = ReportFormaterConsole(printer: mockPrinter)
 
         // WHEN
-        try formater.report(from: emptyData, verbose: false)
+        try withDependencies {
+            $0.printer = mockPrinter
+        } operation: {
+            try ReportFormaterConsole()
+                .report(from: emptyData, verbose: false)
+        }
 
         // THEN
         XCTAssertEqual(mockPrinter.printedMessages.count, 1)
@@ -34,10 +39,14 @@ final class ReportFormaterConsoleTests: XCTestCase {
         // GIVEN
         let swiftLintData = createSwiftLintData()
         let mockPrinter = MockPrinter()
-        let formater = ReportFormaterConsole(printer: mockPrinter)
 
         // WHEN
-        try formater.report(from: swiftLintData, verbose: false)
+        try withDependencies {
+            $0.printer = mockPrinter
+        } operation: {
+            try ReportFormaterConsole()
+                .report(from: swiftLintData, verbose: false)
+        }
 
         // THEN
         XCTAssertGreaterThan(mockPrinter.printedMessages.count, 0)
@@ -48,10 +57,14 @@ final class ReportFormaterConsoleTests: XCTestCase {
         // GIVEN
         let swiftLintData = createMultipleViolationsData()
         let mockPrinter = MockPrinter()
-        let formater = ReportFormaterConsole(printer: mockPrinter)
 
         // WHEN
-        try formater.report(from: swiftLintData, verbose: false)
+        try withDependencies {
+            $0.printer = mockPrinter
+        } operation: {
+            try ReportFormaterConsole()
+                .report(from: swiftLintData, verbose: false)
+        }
 
         // THEN
         XCTAssertGreaterThan(mockPrinter.printedMessages.count, 0)
@@ -75,10 +88,14 @@ final class ReportFormaterConsoleTests: XCTestCase {
         """
         let data = try XCTUnwrap(json.data(using: .utf8))
         let mockPrinter = MockPrinter()
-        let formater = ReportFormaterConsole(printer: mockPrinter)
 
         // WHEN
-        try formater.report(from: data, verbose: false)
+        try withDependencies {
+            $0.printer = mockPrinter
+        } operation: {
+            try ReportFormaterConsole()
+                .report(from: data, verbose: false)
+        }
 
         // THEN
         XCTAssertGreaterThan(mockPrinter.printedMessages.count, 0)
@@ -102,10 +119,14 @@ final class ReportFormaterConsoleTests: XCTestCase {
         """
         let data = try XCTUnwrap(json.data(using: .utf8))
         let mockPrinter = MockPrinter()
-        let formater = ReportFormaterConsole(printer: mockPrinter)
 
         // WHEN
-        try formater.report(from: data, verbose: false)
+        try withDependencies {
+            $0.printer = mockPrinter
+        } operation: {
+            try ReportFormaterConsole()
+                .report(from: data, verbose: false)
+        }
 
         // THEN
         XCTAssertGreaterThan(mockPrinter.printedMessages.count, 0)
@@ -147,10 +168,14 @@ final class ReportFormaterConsoleTests: XCTestCase {
         """
         let data = try XCTUnwrap(json.data(using: .utf8))
         let mockPrinter = MockPrinter()
-        let formater = ReportFormaterConsole(printer: mockPrinter)
 
         // WHEN
-        try formater.report(from: data, verbose: false)
+        try withDependencies {
+            $0.printer = mockPrinter
+        } operation: {
+            try ReportFormaterConsole()
+                .report(from: data, verbose: false)
+        }
 
         // THEN
         XCTAssertGreaterThan(mockPrinter.printedMessages.count, 0)
@@ -161,20 +186,26 @@ final class ReportFormaterConsoleTests: XCTestCase {
         // GIVEN
         let invalidData = "invalid json".data(using: .utf8)!
         let mockPrinter = MockPrinter()
-        let formater = ReportFormaterConsole(printer: mockPrinter)
 
         // WHEN & THEN
-        XCTAssertThrowsError(try formater.report(from: invalidData, verbose: false))
+        try withDependencies {
+            $0.printer = mockPrinter
+        } operation: {
+            XCTAssertThrowsError(try ReportFormaterConsole().report(from: invalidData, verbose: false))
+        }
     }
 
     func test_handles_malformed_json_structure() throws {
         // GIVEN
         let malformedJson = "{\"not\": \"an array\"}".data(using: .utf8)!
         let mockPrinter = MockPrinter()
-        let formater = ReportFormaterConsole(printer: mockPrinter)
 
-        // WHEN & THEN
-        XCTAssertThrowsError(try formater.report(from: malformedJson, verbose: false))
+        // WHEN
+        try withDependencies {
+            $0.printer = mockPrinter
+        } operation: {
+            XCTAssertThrowsError(try ReportFormaterConsole().report(from: malformedJson, verbose: false))
+        }
     }
 
     func test_handles_mixed_severity_types() throws {
@@ -221,10 +252,14 @@ final class ReportFormaterConsoleTests: XCTestCase {
         """
         let data = try XCTUnwrap(json.data(using: .utf8))
         let mockPrinter = MockPrinter()
-        let formater = ReportFormaterConsole(printer: mockPrinter)
 
         // WHEN
-        try formater.report(from: data, verbose: false)
+        try withDependencies {
+            $0.printer = mockPrinter
+        } operation: {
+            try ReportFormaterConsole()
+                .report(from: data, verbose: false)
+        }
 
         // THEN
         XCTAssertGreaterThan(mockPrinter.printedMessages.count, 0)
@@ -248,10 +283,14 @@ final class ReportFormaterConsoleTests: XCTestCase {
         """
         let data = try XCTUnwrap(json.data(using: .utf8))
         let mockPrinter = MockPrinter()
-        let formater = ReportFormaterConsole(printer: mockPrinter)
 
         // WHEN
-        try formater.report(from: data, verbose: false)
+        try withDependencies {
+            $0.printer = mockPrinter
+        } operation: {
+            try ReportFormaterConsole()
+                .report(from: data, verbose: false)
+        }
 
         // THEN
         XCTAssertGreaterThan(mockPrinter.printedMessages.count, 0)
@@ -275,10 +314,14 @@ final class ReportFormaterConsoleTests: XCTestCase {
         """
         let data = try XCTUnwrap(json.data(using: .utf8))
         let mockPrinter = MockPrinter()
-        let formater = ReportFormaterConsole(printer: mockPrinter)
 
         // WHEN
-        try formater.report(from: data, verbose: false)
+        try withDependencies {
+            $0.printer = mockPrinter
+        } operation: {
+            try ReportFormaterConsole()
+                .report(from: data, verbose: false)
+        }
 
         // THEN
         XCTAssertGreaterThan(mockPrinter.printedMessages.count, 0)

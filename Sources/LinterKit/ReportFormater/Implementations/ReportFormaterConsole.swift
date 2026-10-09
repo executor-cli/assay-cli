@@ -1,12 +1,12 @@
+import CascadeKit
 import Foundation
 import Path
 
 struct ReportFormaterConsole: ReportFormater {
-    private let printer: any Printer
+    @Dependency(\.printer)
+    private var printer: any Printer
 
-    init(printer: any Printer) {
-        self.printer = printer
-    }
+    init() {}
 
     func report(from data: Data, verbose: Bool) throws {
         let json = try JSONDecoder().decode([SwiftLintFile].self, from: data)

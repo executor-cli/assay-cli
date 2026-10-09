@@ -1,3 +1,4 @@
+import CascadeKit
 import Foundation
 import Path
 import XCTest
@@ -12,13 +13,14 @@ final class ReportFormaterJsonTests: XCTestCase {
         let fileManagerMock = CreateFileServiceMock()
         let printerMock = PrinterMock()
 
-        let formater = ReportFormaterJson(
-            printer: printerMock,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: swiftLintData, verbose: false)
+        try withDependencies {
+            $0.printer = printerMock
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterJson()
+                .report(from: swiftLintData, verbose: false)
+        }
 
         // THEN
         XCTAssertTrue(fileManagerMock.createFileAtPathContentsAttributesCalled)
@@ -31,14 +33,16 @@ final class ReportFormaterJsonTests: XCTestCase {
         let printerMock = PrinterMock()
         let swiftLintData = createSwiftLintData()
 
-        let formater = ReportFormaterJson(
-            printer: printerMock,
-            outputURL: outputFileURL,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: swiftLintData, verbose: false)
+        try withDependencies {
+            $0.printer = printerMock
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterJson(
+                outputURL: outputFileURL
+            )
+            .report(from: swiftLintData, verbose: false)
+        }
 
         // THEN
         let expectedPath = outputFileURL.appending(component: "documentation-linter.json").pathString
@@ -56,15 +60,17 @@ final class ReportFormaterJsonTests: XCTestCase {
         let printerMock = PrinterMock()
         let swiftLintData = createSwiftLintData()
 
-        let formater = ReportFormaterJson(
-            printer: printerMock,
-            fileName: customFileName,
-            outputURL: outputFileURL,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: swiftLintData, verbose: false)
+        try withDependencies {
+            $0.printer = printerMock
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterJson(
+                fileName: customFileName,
+                outputURL: outputFileURL
+            )
+            .report(from: swiftLintData, verbose: false)
+        }
 
         // THEN
         let expectedPath = outputFileURL.appending(component: customFileName).pathString
@@ -81,14 +87,16 @@ final class ReportFormaterJsonTests: XCTestCase {
         let printerMock = PrinterMock()
         let swiftLintData = createSwiftLintData()
 
-        let formater = ReportFormaterJson(
-            printer: printerMock,
-            outputURL: customPath,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: swiftLintData, verbose: false)
+        try withDependencies {
+            $0.printer = printerMock
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterJson(
+                outputURL: customPath
+            )
+            .report(from: swiftLintData, verbose: false)
+        }
 
         // THEN
         let receivedPath = fileManagerMock.createFileAtPathContentsAttributesReceivedArguments?.path
@@ -101,13 +109,14 @@ final class ReportFormaterJsonTests: XCTestCase {
         let printerMock = PrinterMock()
         let swiftLintData = createSwiftLintData()
 
-        let formater = ReportFormaterJson(
-            printer: printerMock,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: swiftLintData, verbose: false)
+        try withDependencies {
+            $0.printer = printerMock
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterJson()
+                .report(from: swiftLintData, verbose: false)
+        }
 
         // THEN
         XCTAssertTrue(fileManagerMock.createFileAtPathContentsAttributesCalled)
@@ -120,13 +129,15 @@ final class ReportFormaterJsonTests: XCTestCase {
         let printerMock = PrinterMock()
         let invalidData = "invalid json".data(using: .utf8)!
 
-        let formater = ReportFormaterJson(
-            printer: printerMock,
-            fileManager: fileManagerMock
-        )
-
         // WHEN & THEN
-        XCTAssertThrowsError(try formater.report(from: invalidData, verbose: false))
+        try withDependencies {
+            $0.printer = printerMock
+            $0.createFileService = fileManagerMock
+        } operation: {
+            // WHEN & THEN
+            XCTAssertThrowsError(try ReportFormaterJson()
+                .report(from: invalidData, verbose: false))
+        }
     }
 
     func test_encodes_json_correctly() throws {
@@ -135,13 +146,14 @@ final class ReportFormaterJsonTests: XCTestCase {
         let printerMock = PrinterMock()
         let swiftLintData = createSwiftLintData()
 
-        let formater = ReportFormaterJson(
-            printer: printerMock,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: swiftLintData, verbose: false)
+        try withDependencies {
+            $0.printer = printerMock
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterJson()
+                .report(from: swiftLintData, verbose: false)
+        }
 
         // THEN
         guard let contents = fileManagerMock.createFileAtPathContentsAttributesReceivedArguments?.data else {
@@ -161,13 +173,14 @@ final class ReportFormaterJsonTests: XCTestCase {
         let printerMock = PrinterMock()
         let swiftLintData = createSwiftLintData()
 
-        let formater = ReportFormaterJson(
-            printer: printerMock,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: swiftLintData, verbose: false)
+        try withDependencies {
+            $0.printer = printerMock
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterJson()
+                .report(from: swiftLintData, verbose: false)
+        }
 
         // THEN
         // No error message should be printed
@@ -181,14 +194,14 @@ final class ReportFormaterJsonTests: XCTestCase {
         let printerMock = PrinterMock()
         let swiftLintData = createSwiftLintData()
 
-        let formater = ReportFormaterJson(
-            printer: printerMock,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        // Should not throw even if file creation fails
-        try formater.report(from: swiftLintData, verbose: false)
+        try withDependencies {
+            $0.printer = printerMock
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterJson()
+                .report(from: swiftLintData, verbose: false)
+        }
 
         // THEN
         XCTAssertTrue(fileManagerMock.createFileAtPathContentsAttributesCalled)
@@ -200,13 +213,14 @@ final class ReportFormaterJsonTests: XCTestCase {
         let printerMock = PrinterMock()
         let emptyData = "[]".data(using: .utf8)!
 
-        let formater = ReportFormaterJson(
-            printer: printerMock,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: emptyData, verbose: false)
+        try withDependencies {
+            $0.printer = printerMock
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterJson()
+                .report(from: emptyData, verbose: false)
+        }
 
         // THEN
         XCTAssertTrue(fileManagerMock.createFileAtPathContentsAttributesCalled)
@@ -226,13 +240,14 @@ final class ReportFormaterJsonTests: XCTestCase {
         let printerMock = PrinterMock()
         let swiftLintData = createDetailedSwiftLintData()
 
-        let formater = ReportFormaterJson(
-            printer: printerMock,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: swiftLintData, verbose: false)
+        try withDependencies {
+            $0.printer = printerMock
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterJson()
+                .report(from: swiftLintData, verbose: false)
+        }
 
         // THEN
         guard let contents = fileManagerMock.createFileAtPathContentsAttributesReceivedArguments?.data else {
@@ -256,14 +271,16 @@ final class ReportFormaterJsonTests: XCTestCase {
         let printerMock = PrinterMock()
         let swiftLintData = createSwiftLintData()
 
-        let formater = ReportFormaterJson(
-            printer: printerMock,
-            outputURL: outputFileURL,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: swiftLintData, verbose: false)
+        try withDependencies {
+            $0.printer = printerMock
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterJson(
+                outputURL: outputFileURL
+            )
+            .report(from: swiftLintData, verbose: false)
+        }
 
         // THEN
         XCTAssertTrue(printerMock.printCalled)
@@ -278,13 +295,14 @@ final class ReportFormaterJsonTests: XCTestCase {
         let printerMock = PrinterMock()
         let swiftLintData = createSwiftLintData()
 
-        let formater = ReportFormaterJson(
-            printer: printerMock,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: swiftLintData, verbose: true)
+        try withDependencies {
+            $0.printer = printerMock
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterJson()
+                .report(from: swiftLintData, verbose: true)
+        }
 
         // THEN
         XCTAssertTrue(printerMock.printCalled)
@@ -300,14 +318,16 @@ final class ReportFormaterJsonTests: XCTestCase {
         let printerMock = PrinterMock()
         let swiftLintData = createSwiftLintData()
 
-        let formater = ReportFormaterJson(
-            printer: printerMock,
-            outputURL: outputFileURL,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: swiftLintData, verbose: true)
+        try withDependencies {
+            $0.printer = printerMock
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterJson(
+                outputURL: outputFileURL
+            )
+            .report(from: swiftLintData, verbose: true)
+        }
 
         // THEN
         XCTAssertEqual(printerMock.printCallsCount, 2)

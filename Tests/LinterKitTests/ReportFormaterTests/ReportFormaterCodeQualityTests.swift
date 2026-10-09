@@ -1,3 +1,4 @@
+import CascadeKit
 import Foundation
 import Path
 import XCTest
@@ -13,15 +14,17 @@ final class ReportFormaterCodeQualityTests: XCTestCase {
         let fileManagerMock = CreateFileServiceMock()
         let codeclimateData = createCodeclimateData()
 
-        let formater = ReportFormaterCodeQuality(
-            printer: PrinterMock(),
-            fileName: fileName,
-            outputURL: outputFileURL,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: codeclimateData, verbose: false)
+        try withDependencies {
+            $0.printer = PrinterMock()
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterCodeQuality(
+                fileName: fileName,
+                outputURL: outputFileURL
+            )
+            .report(from: codeclimateData, verbose: false)
+        }
 
         // THEN
         XCTAssertEqual(fileManagerMock.createFileAtPathContentsAttributesCallsCount, 1)
@@ -32,13 +35,14 @@ final class ReportFormaterCodeQualityTests: XCTestCase {
         let codeclimateData = createCodeclimateData()
         let fileManagerMock = CreateFileServiceMock()
 
-        let formater = ReportFormaterCodeQuality(
-            printer: PrinterMock(),
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: codeclimateData, verbose: false)
+        try withDependencies {
+            $0.printer = PrinterMock()
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterCodeQuality()
+                .report(from: codeclimateData, verbose: false)
+        }
 
         // THEN
         XCTAssertTrue(fileManagerMock.createFileAtPathContentsAttributesCalled)
@@ -50,14 +54,16 @@ final class ReportFormaterCodeQualityTests: XCTestCase {
         let fileManagerMock = CreateFileServiceMock()
         let codeclimateData = createCodeclimateData()
 
-        let formater = ReportFormaterCodeQuality(
-            printer: PrinterMock(),
-            outputURL: outputFileURL,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: codeclimateData, verbose: false)
+        try withDependencies {
+            $0.printer = PrinterMock()
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterCodeQuality(
+                outputURL: outputFileURL
+            )
+            .report(from: codeclimateData, verbose: false)
+        }
 
         // THEN
         let expectedPath = outputFileURL.appending(component: "gl-code-quality-report.json").pathString
@@ -74,15 +80,17 @@ final class ReportFormaterCodeQualityTests: XCTestCase {
         let fileManagerMock = CreateFileServiceMock()
         let codeclimateData = createCodeclimateData()
 
-        let formater = ReportFormaterCodeQuality(
-            printer: PrinterMock(),
-            fileName: customFileName,
-            outputURL: outputFileURL,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: codeclimateData, verbose: false)
+        try withDependencies {
+            $0.printer = PrinterMock()
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterCodeQuality(
+                fileName: customFileName,
+                outputURL: outputFileURL
+            )
+            .report(from: codeclimateData, verbose: false)
+        }
 
         // THEN
         let expectedPath = outputFileURL.appending(component: customFileName).pathString
@@ -98,14 +106,16 @@ final class ReportFormaterCodeQualityTests: XCTestCase {
         let fileManagerMock = CreateFileServiceMock()
         let codeclimateData = createCodeclimateData()
 
-        let formater = ReportFormaterCodeQuality(
-            printer: PrinterMock(),
-            outputURL: customPath,
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: codeclimateData, verbose: false)
+        try withDependencies {
+            $0.printer = PrinterMock()
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterCodeQuality(
+                outputURL: customPath
+            )
+            .report(from: codeclimateData, verbose: false)
+        }
 
         // THEN
         let receivedPath = fileManagerMock.createFileAtPathContentsAttributesReceivedArguments?.path
@@ -117,13 +127,14 @@ final class ReportFormaterCodeQualityTests: XCTestCase {
         let fileManagerMock = CreateFileServiceMock()
         let codeclimateData = createCodeclimateDataWithSeverities()
 
-        let formater = ReportFormaterCodeQuality(
-            printer: PrinterMock(),
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: codeclimateData, verbose: false)
+        try withDependencies {
+            $0.printer = PrinterMock()
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterCodeQuality()
+                .report(from: codeclimateData, verbose: false)
+        }
 
         // THEN
         guard let contents = fileManagerMock.createFileAtPathContentsAttributesReceivedArguments?.data else {
@@ -146,13 +157,14 @@ final class ReportFormaterCodeQualityTests: XCTestCase {
         let fileManagerMock = CreateFileServiceMock()
         let codeclimateData = createCodeclimateData()
 
-        let formater = ReportFormaterCodeQuality(
-            printer: PrinterMock(),
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: codeclimateData, verbose: false)
+        try withDependencies {
+            $0.printer = PrinterMock()
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterCodeQuality()
+                .report(from: codeclimateData, verbose: false)
+        }
 
         // THEN
         XCTAssertTrue(fileManagerMock.createFileAtPathContentsAttributesCalled)
@@ -163,10 +175,7 @@ final class ReportFormaterCodeQualityTests: XCTestCase {
         let fileManagerMock = CreateFileServiceMock()
         let invalidData = "invalid json".data(using: .utf8)!
 
-        let formater = ReportFormaterCodeQuality(
-            printer: PrinterMock(),
-            fileManager: fileManagerMock
-        )
+        let formater = ReportFormaterCodeQuality()
 
         // WHEN & THEN
         XCTAssertThrowsError(try formater.report(from: invalidData, verbose: false))
@@ -177,13 +186,14 @@ final class ReportFormaterCodeQualityTests: XCTestCase {
         let fileManagerMock = CreateFileServiceMock()
         let codeclimateData = createCodeclimateData()
 
-        let formater = ReportFormaterCodeQuality(
-            printer: PrinterMock(),
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: codeclimateData, verbose: false)
+        try withDependencies {
+            $0.printer = PrinterMock()
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterCodeQuality()
+                .report(from: codeclimateData, verbose: false)
+        }
 
         // THEN
         guard let contents = fileManagerMock.createFileAtPathContentsAttributesReceivedArguments?.data else {
@@ -201,13 +211,14 @@ final class ReportFormaterCodeQualityTests: XCTestCase {
         let fileManagerMock = CreateFileServiceMock()
         let emptyData = "[]".data(using: .utf8)!
 
-        let formater = ReportFormaterCodeQuality(
-            printer: PrinterMock(),
-            fileManager: fileManagerMock
-        )
-
         // WHEN
-        try formater.report(from: emptyData, verbose: false)
+        try withDependencies {
+            $0.printer = PrinterMock()
+            $0.createFileService = fileManagerMock
+        } operation: {
+            try ReportFormaterCodeQuality()
+                .report(from: emptyData, verbose: false)
+        }
 
         // THEN
         XCTAssertTrue(fileManagerMock.createFileAtPathContentsAttributesCalled)

@@ -18,7 +18,7 @@ final class LinterRunnerDefaultTests: XCTestCase {
 
         let runner = LinterRunnerDefault(
             reportFormater: formaterMock,
-            service: serviceMock,
+            linterSrvice: serviceMock,
             linterType: linterType
         )
 
@@ -43,7 +43,7 @@ final class LinterRunnerDefaultTests: XCTestCase {
 
         let runner = LinterRunnerDefault(
             reportFormater: formaterMock,
-            service: serviceMock,
+            linterSrvice: serviceMock,
             linterType: .json
         )
 
@@ -66,7 +66,7 @@ final class LinterRunnerDefaultTests: XCTestCase {
 
         let runner = LinterRunnerDefault(
             reportFormater: formaterMock,
-            service: serviceMock,
+            linterSrvice: serviceMock,
             linterType: .json
         )
 
@@ -91,7 +91,7 @@ final class LinterRunnerDefaultTests: XCTestCase {
 
         let runner = LinterRunnerDefault(
             reportFormater: formaterMock,
-            service: serviceMock,
+            linterSrvice: serviceMock,
             linterType: .json
         )
 
@@ -111,7 +111,7 @@ final class LinterRunnerDefaultTests: XCTestCase {
 
         let runner = LinterRunnerDefault(
             reportFormater: formaterMock,
-            service: serviceMock,
+            linterSrvice: serviceMock,
             linterType: .json
         )
 
@@ -134,7 +134,7 @@ final class LinterRunnerDefaultTests: XCTestCase {
 
         let runner = LinterRunnerDefault(
             reportFormater: formaterMock,
-            service: serviceMock,
+            linterSrvice: serviceMock,
             linterType: .console
         )
 
@@ -161,7 +161,7 @@ final class LinterRunnerDefaultTests: XCTestCase {
 
         let runner = LinterRunnerDefault(
             reportFormater: formaterMock,
-            service: serviceMock,
+            linterSrvice: serviceMock,
             linterType: .json
         )
 
@@ -184,7 +184,7 @@ final class LinterRunnerDefaultTests: XCTestCase {
 
         let runner = LinterRunnerDefault(
             reportFormater: formaterMock,
-            service: serviceMock,
+            linterSrvice: serviceMock,
             linterType: .json
         )
 
@@ -209,7 +209,7 @@ final class LinterRunnerDefaultTests: XCTestCase {
 
         let runner = LinterRunnerDefault(
             reportFormater: formaterMock,
-            service: serviceMock,
+            linterSrvice: serviceMock,
             linterType: .json
         )
 
@@ -232,7 +232,7 @@ final class LinterRunnerDefaultTests: XCTestCase {
         for type in types {
             let runner = LinterRunnerDefault(
                 reportFormater: formaterMock,
-                service: serviceMock,
+                linterSrvice: serviceMock,
                 linterType: type
             )
 
@@ -254,7 +254,7 @@ final class LinterRunnerDefaultTests: XCTestCase {
 
         let runner = LinterRunnerDefault(
             reportFormater: formaterMock,
-            service: serviceMock,
+            linterSrvice: serviceMock,
             linterType: .json
         )
 
@@ -279,7 +279,7 @@ final class LinterRunnerDefaultTests: XCTestCase {
 
         let runner = LinterRunnerDefault(
             reportFormater: formaterMock,
-            service: serviceMock,
+            linterSrvice: serviceMock,
             linterType: .json
         )
 

@@ -3,16 +3,16 @@ import Path
 
 struct LinterRunnerDefault: LinterRunner {
     private let reportFormater: any ReportFormater
-    private let service: any LinterService
+    private let linterSrvice: any LinterService
     private let linterType: LinterType
 
     init(
         reportFormater: any ReportFormater,
-        service: any LinterService,
+        linterSrvice: any LinterService,
         linterType: LinterType
     ) {
         self.reportFormater = reportFormater
-        self.service = service
+        self.linterSrvice = linterSrvice
         self.linterType = linterType
     }
 
@@ -21,7 +21,7 @@ struct LinterRunnerDefault: LinterRunner {
         throwError: Bool,
         verbose: Bool
     ) throws {
-        let results = try service.execute(
+        let results = try linterSrvice.execute(
             forPaths: paths,
             reporter: linterType,
             verbose: verbose

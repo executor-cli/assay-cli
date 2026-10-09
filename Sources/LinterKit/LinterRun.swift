@@ -2,7 +2,21 @@ import Foundation
 import Path
 
 /// Provides static methods for running different types of linters on Swift code
-public enum LinterRun {
+public struct LinterKitFactory: Sendable {
+    private let linterServiceFactory: LinterServiceFactory
+    private let reportFormaterFactory: ReportFormaterFactory
+    private let linterRunnerFactory: LinterRunnerFactory
+
+    public init(
+        linterServiceFactory: LinterServiceFactory,
+        reportFormaterFactory: ReportFormaterFactory,
+        linterRunnerFactory: LinterRunnerFactory
+    ) {
+        self.linterServiceFactory = linterServiceFactory
+        self.reportFormaterFactory = reportFormaterFactory
+        self.linterRunnerFactory = linterRunnerFactory
+    }
+
     /// Execute documentation linting to check for missing documentation comments
     ///
     /// This method lints Swift source files to identify missing or incomplete documentation comments
@@ -22,7 +36,7 @@ public enum LinterRun {
     ///              Defaults to `true`.
     /// - Throws: An error if `throwError` is `true` and linting violations are found, or if the linting
     ///           process encounters an error.
-    public static func documentationLinter(
+    public func documentationLinter(
         _ paths: [AbsolutePath],
         reporter: LinterType,
         throwError: Bool = false,
@@ -31,21 +45,20 @@ public enum LinterRun {
         runnerName: String? = nil,
         verbose: Bool = true
     ) throws {
-        let service = LinterServiceFactory.swiftLint(
+        let linterService = linterServiceFactory.swiftLint(
             fileResourceName: "swiftlint-missingdoc",
             onlyRule: ["missing_docs"]
         )
-        let reporterService = ReportFormaterFactory.build(
+        let reportFormater = reportFormaterFactory.build(
             from: reporter,
-            printer: PrinterFactory.create(),
             runnerName: runnerName,
             fileName: reportFileName,
             reportsPath: reportsPath
         )
-        let runner = LinterRunnerFactory.build(
-            reportFormater: reporterService,
+        let runner = linterRunnerFactory.build(
+            reportFormater: reportFormater,
             from: reporter,
-            service: service
+            linterSrvice: linterService
         )
         try runner.execute(
             forPaths: paths,
@@ -75,7 +88,7 @@ public enum LinterRun {
     ///              Defaults to `true`.
     /// - Throws: An error if `throwError` is `true` and linting violations are found, or if the linting
     ///           process encounters an error.
-    public static func lint(
+    public func lint(
         _ paths: [AbsolutePath],
         reporter: LinterType,
         throwError: Bool = false,
@@ -85,21 +98,20 @@ public enum LinterRun {
         configFile: AbsolutePath? = nil,
         verbose: Bool = true
     ) throws {
-        let service = LinterServiceFactory.swiftLint(
+        let service = linterServiceFactory.swiftLint(
             fileResourceName: "com.raywenderlich.swiftlint",
             configFilePath: configFile?.pathString
         )
-        let reporterService = ReportFormaterFactory.build(
+        let reporterService = reportFormaterFactory.build(
             from: reporter,
-            printer: PrinterFactory.create(),
             runnerName: runnerName,
             fileName: reportFileName,
             reportsPath: reportsPath
         )
-        let runner = LinterRunnerFactory.build(
+        let runner = linterRunnerFactory.build(
             reportFormater: reporterService,
             from: reporter,
-            service: service
+            linterSrvice: service
         )
         try runner.execute(
             forPaths: paths,

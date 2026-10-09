@@ -11,10 +11,10 @@ final class LinterRunnerFactoryTests: XCTestCase {
         let formaterMock = ReportFormaterMock()
 
         // WHEN
-        let runner = LinterRunnerFactory.build(
+        let runner = LinterRunnerFactory().build(
             reportFormater: formaterMock,
             from: type,
-            service: serviceMock
+            linterSrvice: serviceMock
         )
 
         // THEN
@@ -28,10 +28,10 @@ final class LinterRunnerFactoryTests: XCTestCase {
         let formaterMock = ReportFormaterMock()
 
         // WHEN
-        let runner = LinterRunnerFactory.build(
+        let runner = LinterRunnerFactory().build(
             reportFormater: formaterMock,
             from: type,
-            service: serviceMock
+            linterSrvice: serviceMock
         )
 
         // THEN
@@ -45,10 +45,10 @@ final class LinterRunnerFactoryTests: XCTestCase {
         let formaterMock = ReportFormaterMock()
 
         // WHEN
-        let runner = LinterRunnerFactory.build(
+        let runner = LinterRunnerFactory().build(
             reportFormater: formaterMock,
             from: type,
-            service: serviceMock
+            linterSrvice: serviceMock
         )
 
         // THEN
@@ -63,10 +63,10 @@ final class LinterRunnerFactoryTests: XCTestCase {
         serviceMock.executeReturnValue = "[]".data(using: .utf8)!
 
         // WHEN
-        let runner = LinterRunnerFactory.build(
+        let runner = LinterRunnerFactory().build(
             reportFormater: formaterMock,
             from: type,
-            service: serviceMock
+            linterSrvice: serviceMock
         )
 
         // THEN
@@ -85,15 +85,15 @@ final class LinterRunnerFactoryTests: XCTestCase {
         let formaterMock = ReportFormaterMock()
 
         // WHEN
-        let runner1 = LinterRunnerFactory.build(
+        let runner1 = LinterRunnerFactory().build(
             reportFormater: formaterMock,
             from: type,
-            service: serviceMock1
+            linterSrvice: serviceMock1
         )
-        let runner2 = LinterRunnerFactory.build(
+        let runner2 = LinterRunnerFactory().build(
             reportFormater: formaterMock,
             from: type,
-            service: serviceMock2
+            linterSrvice: serviceMock2
         )
 
         // THEN
@@ -110,10 +110,10 @@ final class LinterRunnerFactoryTests: XCTestCase {
 
         // WHEN & THEN
         for type in types {
-            let runner = LinterRunnerFactory.build(
+            let runner = LinterRunnerFactory().build(
                 reportFormater: formaterMock,
                 from: type,
-                service: serviceMock
+                linterSrvice: serviceMock
             )
             XCTAssertTrue(runner is LinterRunnerDefault)
         }

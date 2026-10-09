@@ -7,7 +7,8 @@ import SwiftLintFramework
 struct LinterServiceSwiftLint: LinterService {
     private let jsonEncoder: JSONEncoder
     private let fileResourceName: String
-    private let additionalConfiguration: [String: Any]
+    // Immutable after init and only read by SwiftLint's configuration parser.
+    private nonisolated(unsafe) let additionalConfiguration: [String: Any]
     private let onlyRule: [String]
     private let configFilePath: String?
 

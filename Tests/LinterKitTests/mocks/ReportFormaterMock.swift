@@ -7,7 +7,7 @@
 import Foundation
 @testable import LinterKit
 
-final class ReportFormaterMock: ReportFormater {
+final class ReportFormaterMock: ReportFormater, @unchecked Sendable {
     // MARK: - report
 
     var reportCallsCount = 0

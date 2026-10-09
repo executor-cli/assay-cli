@@ -1,6 +1,6 @@
 import Foundation
 
-public enum LinterType: String {
+public enum LinterType: String, Sendable {
     case json
     case codeQuality = "code-quality"
     case console
