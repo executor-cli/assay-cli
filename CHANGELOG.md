@@ -1,3 +1,21 @@
+# [1.1.0](https://github.com/executor-cli/assay-cli/compare/1.0.0...1.1.0) (2026-10-10)
+
+
+## Features
+
+
+* add DocC documentation catalog and GitHub Pages publishing (#2) ([b9ec3d2](https://github.com/executor-cli/assay-cli/commit/b9ec3d21b7cb0384f4b1eb7353b12c1791f531b5))
+* support layered YAML/JSON config files with XDG user location ([adfbf93](https://github.com/executor-cli/assay-cli/commit/adfbf93179e0d475c5c82f7d269b6ff3b80d21c1))
+
+
+## Bug Fixes
+
+
+* scope executor-cli tool to the tasks that need it ([5a07da1](https://github.com/executor-cli/assay-cli/commit/5a07da1d699b11b382c3599119e88a24e71d7910))
+* generate binaries on all machines fail (#3) ([c3655ab](https://github.com/executor-cli/assay-cli/commit/c3655ab402fe3e70332df97de49e8bed97451030))
+* bump shared CI workflow to 1.1.1 ([81f82fc](https://github.com/executor-cli/assay-cli/commit/81f82fc58915b0d9e133ebcc729d93eeaa6e6035))
+
+
 # 1.0.0 (2026-10-10)
 
 
