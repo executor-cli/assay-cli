@@ -2,6 +2,5 @@
 .git
 .swiftpm
 .DS_Store
-Tests
 mise.local.toml
 README.md
