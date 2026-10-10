@@ -12,6 +12,15 @@ WORKDIR /build
 
 COPY . /build
 
+# Fetch dependencies in their own layer: HTTP/1.1 avoids HTTP/2 stream cancels on flaky networks,
+# and the retries keep a transient clone failure from failing the whole build.
+RUN git config --global http.version HTTP/1.1 && \
+    for attempt in 1 2 3 4 5; do \
+        swift package --package-path /build resolve && break; \
+        [ "$attempt" = 5 ] && exit 1; \
+        sleep 5; \
+    done
+
 # Compile with optimizations
 ARG SWIFT_FLAGS="-c release -Xswiftc -g -Xswiftc -static-stdlib"
 
