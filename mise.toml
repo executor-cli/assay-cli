@@ -34,7 +34,16 @@ run = '''
 set -euo pipefail
 # Linux has no ABI-stable system Swift runtime; link it in so the tarball runs anywhere.
 # SwiftLint pulls in FoundationNetworking, whose static library needs libcurl at link time.
-if [ "$(uname -s)" = "Linux" ]; then STATIC="--static-swift-stdlib -Xlinker -lcurl"; else STATIC=""; fi
+STATIC=""
+if [ "$(uname -s)" = "Linux" ]; then
+    # -lcurl needs libcurl.so, which only the dev package provides (the runtime package has libcurl.so.4 only).
+    if ! ldconfig -p | grep -q 'libcurl\.so '; then
+        SUDO=$(command -v sudo || true)
+        $SUDO apt-get update -qq
+        $SUDO apt-get install -y -qq libcurl4-openssl-dev
+    fi
+    STATIC="--static-swift-stdlib -Xlinker -lcurl"
+fi
 swift build -c release --disable-sandbox $STATIC ${usage_arch:+--arch "$usage_arch"}
 BIN_DIR=$(swift build -c release --show-bin-path --disable-sandbox ${usage_arch:+--arch "$usage_arch"})
 mkdir -p .build/release
