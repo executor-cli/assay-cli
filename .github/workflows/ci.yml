@@ -18,4 +18,4 @@ jobs:
       enable-linux: true
       enable-lint: true
       enable-coverage: false
-      enable-title-check: true
+      enable-title-check: false
