@@ -23,7 +23,11 @@ let package = Package(
             url: "https://github.com/realm/SwiftLint",
             from: "0.60.0"
         ),
-        .package(url: "https://github.com/apple/swift-configuration.git", from: "1.0.0"),
+        .package(
+            url: "https://github.com/apple/swift-configuration.git",
+            from: "1.0.0",
+            traits: [.defaults, "YAML"]
+        ),
         .package(
             url: "https://github.com/tuist/Path",
             exact: "0.3.8"
@@ -54,6 +58,13 @@ let package = Package(
             dependencies: [
                 .target(name: "AppCore"),
                 .product(name: "Configuration", package: "swift-configuration")
+            ]
+        ),
+        .testTarget(
+            name: "AppConfigurationTests",
+            dependencies: [
+                .target(name: "AppConfiguration"),
+                .target(name: "AppCore")
             ]
         ),
         .executableTarget(
