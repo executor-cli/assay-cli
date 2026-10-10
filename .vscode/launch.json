@@ -19,6 +19,26 @@
       "target": "AssayCLI",
       "configuration": "release",
       "preLaunchTask": "swift: Build Release AssayCLI"
+    },
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:static-analyser-cli}",
+      "name": "Debug assay",
+      "target": "assay",
+      "configuration": "debug",
+      "preLaunchTask": "swift: Build Debug assay"
+    },
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:static-analyser-cli}",
+      "name": "Release assay",
+      "target": "assay",
+      "configuration": "release",
+      "preLaunchTask": "swift: Build Release assay"
     }
   ]
 }
