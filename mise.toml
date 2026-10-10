@@ -132,6 +132,29 @@ executor test report --report-for-type swift ./
 executor coverage swift --verbose
 '''
 
+[tasks.build_documentations]
+description = "Build the documentation using docc"
+usage = '''
+arg <platform> help="The default platform" default="macOS" {
+    choices "iOS" "macOS"
+}
+flag "--hosting-base-path <hosting-base-path>" help="Hosting base path" default="" env="HOSTING_BASE_PATH"
+flag "--main-library-name <main-library-name>" help="The main package library" default="assay-cli-Package" env="MAIN_LIBRARY_NAME"
+flag "--serve" help="Start a Python HTTP server after building"
+'''
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+executor xcodebuild docc\
+    --platform "${usage_platform?}"\
+    --hosting-base-path "${usage_hosting_base_path?}"\
+    --output-path "public"\
+    --verbose
+if [[ "${usage_serve:-}" == "true" ]]; then
+    python3 -m http.server -d public
+fi
+'''
+
 [tasks.run]
 description = "Run the CLI (pass args after --)"
 run = "swift run AssayCLI"

@@ -10,3 +10,6 @@ DerivedData/
 .envrc
 .env*
 mise.local.toml
+public
+*.log
+Combined.doccarchive
