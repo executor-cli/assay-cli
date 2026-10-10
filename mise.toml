@@ -9,9 +9,6 @@
 # Swift toolchain — provisioned by mise so CI works on Linux (where ubuntu
 # runners ship no Swift) as well as macOS.
 swift = "6.3.3"
-# executor-cli powers the CI lint/format/coverage tasks (provisioned by mise in CI).
-# It publishes no linux-arm64 asset, so mise skips it there (build-release does not need it).
-"github:executor-cli/executor" = { version = "0.28.5", os = ["macos", "linux-x64"] }
 
 [env]
 # Per-user install prefix — the best-practice location for user binaries
@@ -47,6 +44,7 @@ mkdir -p .build/release
 
 [tasks.release]
 description = "Run semantic-release. Use --dry-run to preview without publishing."
+tools = { "github:executor-cli/executor" = "0.28.5" }
 usage = '''
 flag "-d --dry-run" help="Preview the release without publishing (no tag, no commit, no GitHub Release)"
 flag "--write-change-log" help="Enable writing a changelog"
@@ -88,18 +86,22 @@ run = "swift test"
 
 [tasks.format]
 description = "Format the code using SwiftFormat (executor)"
+tools = { "github:executor-cli/executor" = "0.28.5" }
 run = "executor format ."
 
 [tasks.check_code]
 description = "Lint source code (executor)"
+tools = { "github:executor-cli/executor" = "0.28.5" }
 run = "executor linting code ./Sources --reporter console"
 
 [tasks.check_documentation]
 description = "Lint code documentation (executor)"
+tools = { "github:executor-cli/executor" = "0.28.5" }
 run = "executor linting documentation ./Sources --reporter console"
 
 [tasks.check_merge_request_title]
 description = "Lint the pull request title and post the result as a PR comment."
+tools = { "github:executor-cli/executor" = "0.28.5" }
 run = '''
 #!/usr/bin/env bash
 set -euo pipefail
@@ -110,6 +112,7 @@ executor check-ci merge-request-title --post-comment --comment-token "${GITHUB_T
 
 [tasks.lint]
 description = "Run all static checks (code + documentation) — used by CI's lint job"
+tools = { "github:executor-cli/executor" = "0.28.5" }
 run = '''
 #!/usr/bin/env bash
 set -euo pipefail
@@ -127,6 +130,7 @@ executor linting documentation ./Sources --reporter console
 
 [tasks.test-coverage]
 description = "Run tests with coverage (macOS only; used by CI when coverage is enabled)"
+tools = { "github:executor-cli/executor" = "0.28.5" }
 run = '''
 #!/usr/bin/env bash
 set -euo pipefail
@@ -137,6 +141,7 @@ executor coverage swift --verbose
 
 [tasks.build_documentations]
 description = "Build the documentation using docc"
+tools = { "github:executor-cli/executor" = "0.28.5" }
 usage = '''
 arg <platform> help="The default platform" default="macOS" {
     choices "iOS" "macOS"
