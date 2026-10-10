@@ -87,6 +87,11 @@ jobs:
           TAG: ${{ needs.image.outputs.tag }}
         run: |
           set -euo pipefail
-          docker buildx imagetools create \
-            -t "$IMAGE:$TAG" -t "$IMAGE:latest" \
+          VERSION="${TAG#v}"
+          TAGS=(-t "$IMAGE:$TAG")
+          # Floating tags (1.2, 1, latest) only for stable releases, never for 1.2.6-beta.1.
+          if [[ "$VERSION" =~ ^([0-9]+)\.([0-9]+)\.[0-9]+$ ]]; then
+            TAGS+=(-t "$IMAGE:${BASH_REMATCH[1]}.${BASH_REMATCH[2]}" -t "$IMAGE:${BASH_REMATCH[1]}" -t "$IMAGE:latest")
+          fi
+          docker buildx imagetools create "${TAGS[@]}" \
             "$IMAGE:$TAG-amd64" "$IMAGE:$TAG-arm64"
