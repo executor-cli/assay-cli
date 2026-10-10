@@ -10,13 +10,14 @@
 # runners ship no Swift) as well as macOS.
 swift = "6.3.3"
 # executor-cli powers the CI lint/format/coverage tasks (provisioned by mise in CI).
-"github:executor-cli/executor" = "0.28.5"
+# It publishes no linux-arm64 asset, so mise skips it there (build-release does not need it).
+"github:executor-cli/executor" = { version = "0.28.5", os = ["macos", "linux-x64"] }
 
 [env]
 # Per-user install prefix — the best-practice location for user binaries
 # (no sudo, doesn't touch the rest of the machine). Override with INSTALL_DIR=...
 INSTALL_DIR = "{{ env.HOME }}/.local/bin"
-# Installed command name (the Swift product is AssayCLI).
+# Installed command name (the Swift product is also assay).
 BIN_NAME = "assay"
 # Make the install dir visible on PATH inside this project's mise environment,
 # so the freshly-installed binary resolves without touching your shell profile.
@@ -35,11 +36,13 @@ run = '''
 #!/usr/bin/env bash
 set -euo pipefail
 # Linux has no ABI-stable system Swift runtime; link it in so the tarball runs anywhere.
-if [ "$(uname -s)" = "Linux" ]; then STATIC="--static-swift-stdlib"; else STATIC=""; fi
+# SwiftLint pulls in FoundationNetworking, whose static library needs libcurl at link time.
+if [ "$(uname -s)" = "Linux" ]; then STATIC="--static-swift-stdlib -Xlinker -lcurl"; else STATIC=""; fi
 swift build -c release --disable-sandbox $STATIC ${usage_arch:+--arch "$usage_arch"}
 BIN_DIR=$(swift build -c release --show-bin-path --disable-sandbox ${usage_arch:+--arch "$usage_arch"})
 mkdir -p .build/release
-cp "$BIN_DIR/AssayCLI" ".build/release/$BIN_NAME"
+# .build/release is a symlink to the host-arch build dir, so source and destination can be the same file
+[ "$BIN_DIR/assay" -ef ".build/release/$BIN_NAME" ] || cp "$BIN_DIR/assay" ".build/release/$BIN_NAME"
 '''
 
 [tasks.release]
@@ -157,7 +160,7 @@ fi
 
 [tasks.run]
 description = "Run the CLI (pass args after --)"
-run = "swift run AssayCLI"
+run = "swift run assay"
 
 [tasks.install]
 description = "Build (release) and install assay to a bin dir (default: ~/.local/bin)"
@@ -171,7 +174,7 @@ set -euo pipefail
 # Priority: --bin-path flag > $INSTALL_DIR env > ~/.local/bin
 DIR="${usage_bin_path:-${INSTALL_DIR:-$HOME/.local/bin}}"
 mkdir -p "$DIR"
-BIN="$(swift build -c release --show-bin-path)/AssayCLI"
+BIN="$(swift build -c release --show-bin-path)/assay"
 install -m 0755 "$BIN" "$DIR/$BIN_NAME"
 echo "Installed $BIN_NAME -> $DIR/$BIN_NAME"
 case ":${PATH}:" in
