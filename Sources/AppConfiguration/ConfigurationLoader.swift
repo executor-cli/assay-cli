@@ -3,41 +3,76 @@ import Configuration
 import Foundation
 import SystemPackage
 
-/// Resolves configuration into `FeatureFlags`.
+/// Resolves configuration into an `AppConfiguration`.
 ///
-/// Pure resolver: it builds a `ConfigReader` from the environment (highest
-/// precedence) layered over an optional JSON config file and returns the flags.
-/// Storage/caching is the dependency container's job — this stays free of any
-/// DI framework so it can be reused on its own.
+/// Pure resolver: it layers a `ConfigReader` from, highest precedence first,
+/// the environment, a project file in the working directory (`assay-cli.yml`/`.yaml`/`.json`) and a
+/// user file in `$XDG_CONFIG_HOME/assay` or `~/.config/assay` (`config.yml`/`.yaml`/`.json`). Storage/caching
+/// is the dependency
+/// container's job — this stays free of any DI framework so it can be reused on its own.
 public enum ConfigurationLoader {
-    /// Default config file name, looked up in the current working directory.
-    private static let defaultConfigFileName = "assay-cli.json"
+    private static let projectFileBaseName = "assay-cli"
+    private static let userFileBaseName = "config"
+    private static let fileExtensions = ["yml", "yaml", "json"]
 
-    /// Resolves the feature flags from the environment layered over an optional
-    /// JSON config file (env wins). The file provider is asynchronous, hence `async`.
-    public static func resolve() async -> AppConfiguration {
-        await AppConfiguration(config: configReader())
-    }
-
-    /// Builds a `ConfigReader` from the environment (highest precedence) layered
-    /// over an optional JSON config file.
-    private static func configReader() async -> ConfigReader {
-        var providers: [any ConfigProvider] = [EnvironmentVariablesProvider()]
-        if let fileProvider = await jsonFileProvider() {
-            providers.append(fileProvider)
+    public static func resolve(
+        environment: [String: String] = ProcessInfo.processInfo.environment,
+        currentDirectory: String = FileManager.default.currentDirectoryPath,
+        homeDirectory: String = NSHomeDirectory()
+    ) async -> AppConfiguration {
+        var providers: [any ConfigProvider] =
+            [EnvironmentVariablesProvider(environmentVariables: environment)]
+        let paths = configFilePaths(
+            environment: environment,
+            currentDirectory: currentDirectory,
+            homeDirectory: homeDirectory
+        )
+        for path in paths {
+            if let provider = await fileProvider(at: path) {
+                providers.append(provider)
+            }
         }
-        return ConfigReader(providers: providers)
+        return AppConfiguration(config: ConfigReader(providers: providers))
     }
 
-    private static func jsonFileProvider() async -> (any ConfigProvider)? {
-        let path = defaultConfigFileName
-        guard FileManager.default.fileExists(atPath: path) else { return nil }
+    /// The config files that exist, highest precedence first. Only the first matching extension of
+    /// each location is used (`yml`, then `yaml`, then `json`).
+    static func configFilePaths(
+        environment: [String: String],
+        currentDirectory: String,
+        homeDirectory: String
+    ) -> [String] {
+        let locations = [
+            (directory: currentDirectory, baseName: projectFileBaseName),
+            (
+                directory: userConfigDirectory(environment: environment, homeDirectory: homeDirectory),
+                baseName: userFileBaseName
+            )
+        ]
+        return locations.compactMap { location in
+            fileExtensions
+                .map { "\(location.directory)/\(location.baseName).\($0)" }
+                .first { FileManager.default.fileExists(atPath: $0) }
+        }
+    }
 
+    /// `$XDG_CONFIG_HOME/assay`, or `~/.config/assay`. Per the XDG spec, an empty or relative
+    /// `XDG_CONFIG_HOME` is ignored.
+    static func userConfigDirectory(environment: [String: String], homeDirectory: String) -> String {
+        if let xdgConfigHome = environment["XDG_CONFIG_HOME"], xdgConfigHome.hasPrefix("/") {
+            return "\(xdgConfigHome)/assay"
+        }
+        return "\(homeDirectory)/.config/assay"
+    }
+
+    private static func fileProvider(at path: String) async -> (any ConfigProvider)? {
         do {
-            return try await FileProvider<JSONSnapshot>(filePath: FilePath(path))
+            if path.hasSuffix(".json") {
+                return try await FileProvider<JSONSnapshot>(filePath: FilePath(path))
+            }
+            return try await FileProvider<YAMLSnapshot>(filePath: FilePath(path))
         } catch {
-            // Malformed/unreadable config file: fall back to env-only, and warn on
-            // stderr (never stdout — serve mode reserves it for JSON-RPC).
+            // Malformed/unreadable config file: skip it, and warn on stderr (never stdout).
             FileHandle.standardError.write(Data("warning: ignoring config file \(path): \(error)\n".utf8))
             return nil
         }

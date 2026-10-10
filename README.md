@@ -28,13 +28,20 @@ An entry without `/` matches any folder name; an entry with `/` matches as a pat
 
 ## Configuration
 
-Optional `assay-cli.json` in the working directory. Environment variables take precedence over the file.
+Optional config files, YAML or JSON. Sources are layered, highest precedence first:
 
-```json
-{
-  "format": { "swiftVersion": "6.1", "defaultExcludes": [".build", "DerivedData"] },
-  "linter": { "defaultExcludes": [".build", "DerivedData", "Carthage", "Pods"] }
-}
+1. environment variables (`FORMAT_SWIFT_VERSION`, `LINTER_DEFAULT_EXCLUDES=a,b`, ...)
+2. project file in the working directory: `assay-cli.yml`, `assay-cli.yaml` or `assay-cli.json`
+3. user file in `$XDG_CONFIG_HOME/assay` (when set to an absolute path) or `~/.config/assay`: `config.yml`, `config.yaml` or `config.json`
+
+In each location the first file found is used (`yml`, then `yaml`, then `json`). Values missing from a layer fall through to the next one, then to the built-in defaults. A malformed file is skipped with a warning on stderr.
+
+```yaml
+format:
+  swiftVersion: "6.1"
+  defaultExcludes: [.build, DerivedData]
+linter:
+  defaultExcludes: [.build, DerivedData, Carthage, Pods]
 ```
 
 ## Layout
