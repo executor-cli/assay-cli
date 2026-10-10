@@ -22,7 +22,8 @@ RUN git config --global http.version HTTP/1.1 && \
     done
 
 # Compile with optimizations
-ARG SWIFT_FLAGS="-c release -Xswiftc -g -Xswiftc -static-stdlib"
+# -lcurl: SwiftLint pulls in FoundationNetworking, whose static library needs libcurl at link time
+ARG SWIFT_FLAGS="-c release -Xswiftc -g -Xswiftc -static-stdlib -Xlinker -lcurl"
 
 # Build the assay binary
 RUN swift build --package-path /build $SWIFT_FLAGS --product assay
