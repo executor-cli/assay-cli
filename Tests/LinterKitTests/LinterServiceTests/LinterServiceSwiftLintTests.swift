@@ -134,3 +134,19 @@ final class LinterServiceSwiftLintTests: XCTestCase {
         try writeFile(named: name, contents: contents)
     }
 }
+
+final class LinterServiceSwiftLintExcludeTests: XCTestCase {
+    func test_name_entry_matches_any_path_component() {
+        XCTAssertTrue(LinterServiceSwiftLint.isExcluded("/p/.build/checkouts/A.swift", matching: [".build"]))
+        XCTAssertFalse(LinterServiceSwiftLint.isExcluded("/p/Sources/A.swift", matching: [".build"]))
+    }
+
+    func test_path_entry_matches_as_fragment() {
+        XCTAssertTrue(LinterServiceSwiftLint.isExcluded("/p/Sources/Gen/A.swift", matching: ["Sources/Gen"]))
+        XCTAssertFalse(LinterServiceSwiftLint.isExcluded("/p/Sources/Generated/A.swift", matching: ["Sources/Gen"]))
+    }
+
+    func test_no_excludes_keeps_everything() {
+        XCTAssertFalse(LinterServiceSwiftLint.isExcluded("/p/.build/A.swift", matching: []))
+    }
+}

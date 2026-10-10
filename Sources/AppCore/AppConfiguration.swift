@@ -6,10 +6,13 @@ import Foundation
 /// resolved values synchronously.
 public struct AppConfiguration: Sendable {
     public var format: FormatConfiguration
+    public var linter: LinterConfiguration
 
     public init(
-        format: FormatConfiguration = .default
+        format: FormatConfiguration = .default,
+        linter: LinterConfiguration = .default
     ) {
         self.format = format
+        self.linter = linter
     }
 }

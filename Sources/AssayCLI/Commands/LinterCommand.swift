@@ -1,4 +1,5 @@
 import App
+import AppCore
 import ArgumentParser
 import Foundation
 import LinterKit
@@ -60,6 +61,23 @@ private struct LinterOptions: ParsableArguments {
         help: "Throw error if any linting error detected"
     )
     var throwError: Bool = false
+
+    @Option(
+        name: [.customLong("exclude")],
+        help: ArgumentHelp(
+            "Files and Folders name or path to skip (repeatable).",
+            discussion: """
+            Merged with the configured defaults (.build, DerivedData, Carthage, Pods) and the `excluded` \
+            entries of the SwiftLint configuration. Pass multiple --exclude flags to exclude multiple folders.
+            """
+        ),
+        completion: .directory
+    )
+    var exclude: [String] = []
+
+    func mergedExcludes(with configuration: AppConfiguration) -> [String] {
+        configuration.linter.defaultExcludes.merging(exclude)
+    }
 }
 
 extension LinterType: ExpressibleByArgument {}
@@ -82,6 +100,7 @@ private struct DocumentationLinter: ParsableCommand {
     init() {}
 
     func run() throws {
+        let configuration = app.make(AppConfigurationKey.self)
         let linterServiceFactory = app.make(LinterServiceFactoryKey.self)
         let reportFormaterFactory = app.make(ReportFormaterFactoryKey.self)
         let linterRunnerFactory = app.make(LinterRunnerFactoryKey.self)
@@ -98,6 +117,7 @@ private struct DocumentationLinter: ParsableCommand {
             reportsPath: options.reportPath,
             reportFileName: options.filename,
             runnerName: options.runnerName,
+            exclude: options.mergedExcludes(with: configuration),
             verbose: verbose
         )
     }
@@ -135,6 +155,7 @@ private struct CodeLinter: ParsableCommand {
     init() {}
 
     func run() throws {
+        let configuration = app.make(AppConfigurationKey.self)
         let linterServiceFactory = app.make(LinterServiceFactoryKey.self)
         let reportFormaterFactory = app.make(ReportFormaterFactoryKey.self)
         let linterRunnerFactory = app.make(LinterRunnerFactoryKey.self)
@@ -152,6 +173,7 @@ private struct CodeLinter: ParsableCommand {
             reportFileName: options.filename,
             runnerName: options.runnerName,
             configFile: configFile,
+            exclude: options.mergedExcludes(with: configuration),
             verbose: verbose
         )
     }

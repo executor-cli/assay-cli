@@ -8,14 +8,16 @@ public struct LinterServiceFactory: Sendable {
         additionalConfiguration: [String: Any] = [:],
         onlyRule: [String] = [],
         jsonEncoder: JSONEncoder = JSONEncoder(),
-        configFilePath: String? = nil
+        configFilePath: String? = nil,
+        exclude: [String] = []
     ) -> any LinterService {
         LinterServiceSwiftLint(
             fileResourceName: fileResourceName,
             additionalConfiguration: additionalConfiguration,
             onlyRule: onlyRule,
             jsonEncoder: jsonEncoder,
-            configFilePath: configFilePath
+            configFilePath: configFilePath,
+            exclude: exclude
         )
     }
 }

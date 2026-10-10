@@ -12,18 +12,22 @@ struct LinterServiceSwiftLint: LinterService {
     private let onlyRule: [String]
     private let configFilePath: String?
 
+    private let exclude: [String]
+
     init(
         fileResourceName: String,
         additionalConfiguration: [String: Any],
         onlyRule: [String],
         jsonEncoder: JSONEncoder,
-        configFilePath: String? = nil
+        configFilePath: String? = nil,
+        exclude: [String] = []
     ) {
         self.jsonEncoder = jsonEncoder
         self.fileResourceName = fileResourceName
         self.additionalConfiguration = additionalConfiguration
         self.onlyRule = onlyRule
         self.configFilePath = configFilePath
+        self.exclude = exclude
     }
 
     func execute(
@@ -53,12 +57,15 @@ struct LinterServiceSwiftLint: LinterService {
             )
         }
 
-        let swiftFiles = paths.flatMap {
+        let lintableFiles = paths.flatMap {
             configuration.lintableFiles(
                 inPath: URL(fileURLWithPath: $0.pathString),
                 forceExclude: false,
                 excludeByPrefix: false
             )
+        }
+        let swiftFiles = lintableFiles.filter { file in
+            !Self.isExcluded(file.path?.path ?? "", matching: exclude)
         }
 
         let storage = RuleStorage()
@@ -70,6 +77,16 @@ struct LinterServiceSwiftLint: LinterService {
         }
 
         return try generateData(violations: violations, type: reporter)
+    }
+
+    /// An entry without `/` matches any path component; an entry with `/` matches as a path fragment.
+    static func isExcluded(_ path: String, matching excludes: [String]) -> Bool {
+        let components = Set(path.split(separator: "/").map(String.init))
+        return excludes.contains { entry in
+            let normalized = entry.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+            guard entry.contains("/") else { return components.contains(entry) }
+            return path.contains("/" + normalized + "/") || path.hasSuffix("/" + normalized)
+        }
     }
 
     private func resolveConfigPath() throws -> String {

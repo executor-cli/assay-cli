@@ -32,6 +32,7 @@ public struct LinterKitFactory: Sendable {
     ///   - reportFileName: Custom filename for the generated report. Defaults to empty string, which uses
     ///                     the default filename based on reporter type.
     ///   - runnerName: Prefix to add to report filenames, typically used to identify CI/CD runner.
+    ///   - exclude: Folder names or paths to skip, on top of any `excluded` entries of the SwiftLint config.
     ///   - verbose: Enable verbose output mode to display detailed information about report generation.
     ///              Defaults to `true`.
     /// - Throws: An error if `throwError` is `true` and linting violations are found, or if the linting
@@ -43,11 +44,13 @@ public struct LinterKitFactory: Sendable {
         reportsPath: AbsolutePath = .currentWorkingDirectory,
         reportFileName: String = .codeQualityReportFileName,
         runnerName: String? = nil,
+        exclude: [String] = [],
         verbose: Bool = true
     ) throws {
         let linterService = linterServiceFactory.swiftLint(
             fileResourceName: "swiftlint-missingdoc",
-            onlyRule: ["missing_docs"]
+            onlyRule: ["missing_docs"],
+            exclude: exclude
         )
         let reportFormater = reportFormaterFactory.build(
             from: reporter,
@@ -84,6 +87,7 @@ public struct LinterKitFactory: Sendable {
     ///   - runnerName: Prefix to add to report filenames, typically used to identify CI/CD runner.
     ///   - configFile: Optional path to a `.swiftlint.yml` that fully overrides the bundled
     ///                 configuration. When `nil`, the bundled `com.raywenderlich.swiftlint` config is used.
+    ///   - exclude: Folder names or paths to skip, on top of any `excluded` entries of the SwiftLint config.
     ///   - verbose: Enable verbose output mode to display detailed information about report generation.
     ///              Defaults to `true`.
     /// - Throws: An error if `throwError` is `true` and linting violations are found, or if the linting
@@ -96,11 +100,13 @@ public struct LinterKitFactory: Sendable {
         reportFileName: String = .codeQualityReportFileName,
         runnerName: String? = nil,
         configFile: AbsolutePath? = nil,
+        exclude: [String] = [],
         verbose: Bool = true
     ) throws {
         let service = linterServiceFactory.swiftLint(
             fileResourceName: "com.raywenderlich.swiftlint",
-            configFilePath: configFile?.pathString
+            configFilePath: configFile?.pathString,
+            exclude: exclude
         )
         let reporterService = reportFormaterFactory.build(
             from: reporter,
