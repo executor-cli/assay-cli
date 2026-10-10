@@ -8,7 +8,7 @@
 [tools]
 # Swift toolchain — provisioned by mise so CI works on Linux (where ubuntu
 # runners ship no Swift) as well as macOS.
-swift = "6.1.1"
+swift = "6.3.3"
 # executor-cli powers the CI lint/format/coverage tasks (provisioned by mise in CI).
 "github:executor-cli/executor" = "0.28.5"
 
