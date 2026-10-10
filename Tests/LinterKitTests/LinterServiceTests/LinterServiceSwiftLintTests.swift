@@ -143,7 +143,10 @@ final class LinterServiceSwiftLintExcludeTests: XCTestCase {
 
     func test_path_entry_matches_as_fragment() {
         XCTAssertTrue(LinterServiceSwiftLint.isExcluded("/p/Sources/Gen/A.swift", matching: ["Sources/Gen"]))
-        XCTAssertFalse(LinterServiceSwiftLint.isExcluded("/p/Sources/Generated/A.swift", matching: ["Sources/Gen"]))
+        XCTAssertFalse(LinterServiceSwiftLint.isExcluded(
+            "/p/Sources/Generated/A.swift",
+            matching: ["Sources/Gen"]
+        ))
     }
 
     func test_no_excludes_keeps_everything() {

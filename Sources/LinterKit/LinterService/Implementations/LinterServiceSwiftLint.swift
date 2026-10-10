@@ -85,6 +85,7 @@ struct LinterServiceSwiftLint: LinterService {
         return excludes.contains { entry in
             let normalized = entry.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
             guard entry.contains("/") else { return components.contains(entry) }
+
             return path.contains("/" + normalized + "/") || path.hasSuffix("/" + normalized)
         }
     }
