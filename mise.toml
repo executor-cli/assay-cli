@@ -84,6 +84,7 @@ if [[ "${usage_skip_ci:-}" == "false" ]]; then
     skip_ci_opt="--no-skip-ci"
 fi
 
+source scripts/executor-linux-libs.sh
 executor release package $dry_run_opt $enable_changelog_opt $enable_verbose_opt $skip_ci_opt --current-directory .
 '''
 
