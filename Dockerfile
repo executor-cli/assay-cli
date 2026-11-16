@@ -32,12 +32,6 @@ RUN --mount=type=cache,target=/build/.build \
     install -m 0755 "$BIN_PATH/assay" /assay-binary/assay && \
     find "$BIN_PATH" -maxdepth 1 -name "assay-cli_*.resources" -exec cp -r {} /assay-resources/ \;
 
-# Copy Swift toolchain libraries needed by SwiftLint at runtime (SourceKit and the compiler's swift-syntax)
-RUN mkdir -p /assay-libs && \
-    cp /usr/lib/libsourcekitdInProc.so /assay-libs/ && \
-    cp /usr/lib/swift/linux/*.so /assay-libs/ && \
-    cp /usr/lib/swift/host/compiler/*.so /assay-libs/ 2>/dev/null || true
-
 # ================================
 # Run image
 # ================================
@@ -47,7 +41,11 @@ FROM ${RUNTIME_IMAGE}
 # Copy the executable, resource bundles, and shared libraries
 COPY --from=build /assay-binary/assay /usr/bin/assay
 COPY --from=build /assay-resources /usr/bin/
-COPY --from=build /assay-libs/* /usr/lib/
+# SwiftLint loads SourceKit at runtime, which links the compiler's swift-syntax libraries; neither
+# ships in the slim image. Keep the toolchain layout so their $ORIGIN RUNPATHs resolve to the slim
+# image's own Swift runtime in /usr/lib/swift/linux.
+COPY --from=build /usr/lib/libsourcekitdInProc.so /usr/lib/
+COPY --from=build /usr/lib/swift/host/compiler/ /usr/lib/swift/host/compiler/
 
 # Set entrypoint
 CMD ["assay"]
