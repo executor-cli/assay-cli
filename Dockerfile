@@ -3,7 +3,8 @@
 # Build image
 # ================================
 ARG BUILDER_IMAGE=swift:6.3
-ARG RUNTIME_IMAGE=swift:6.3-slim
+# assay links the Swift stdlib statically, so a plain Ubuntu matching the builder's base is enough.
+ARG RUNTIME_IMAGE=ubuntu:24.04
 
 # Builder image
 FROM ${BUILDER_IMAGE} AS build
@@ -13,7 +14,7 @@ WORKDIR /build
 COPY . /build
 
 # -lcurl: SwiftLint pulls in FoundationNetworking, whose static library needs libcurl at link time
-ARG SWIFT_FLAGS="-c release -Xswiftc -g -Xswiftc -static-stdlib -Xlinker -lcurl"
+ARG SWIFT_FLAGS="-c release -Xswiftc -static-stdlib -Xlinker -lcurl"
 
 # .build and SwiftPM's cache are multi-GB: keep them in cache mounts so they never become image
 # layers (which `cache-to: type=gha,mode=max` would upload and fill the runner disk with).
@@ -28,9 +29,20 @@ RUN --mount=type=cache,target=/build/.build \
     done && \
     swift build --package-path /build $SWIFT_FLAGS --product assay && \
     BIN_PATH=$(swift build --package-path /build $SWIFT_FLAGS --show-bin-path) && \
-    mkdir -p /assay-binary /assay-resources && \
-    install -m 0755 "$BIN_PATH/assay" /assay-binary/assay && \
-    find "$BIN_PATH" -maxdepth 1 -name "assay-cli_*.resources" -exec cp -r {} /assay-resources/ \;
+    mkdir -p /runtime/usr/bin && \
+    install -m 0755 "$BIN_PATH/assay" /runtime/usr/bin/assay && \
+    find "$BIN_PATH" -maxdepth 1 -name "assay-cli_*.resources" -exec cp -r {} /runtime/usr/bin/ \;
+
+# SwiftLint loads SourceKit at runtime, which links the compiler's swift-syntax libraries and a few
+# Swift runtime libraries. Keep the toolchain layout so their $ORIGIN RUNPATHs still resolve.
+RUN mkdir -p /runtime/usr/lib/swift/linux /runtime/usr/lib/swift/host/compiler && \
+    cp /usr/lib/libsourcekitdInProc.so /runtime/usr/lib/ && \
+    cp /usr/lib/swift/host/compiler/lib_CompilerSwift*.so /runtime/usr/lib/swift/host/compiler/ && \
+    for lib in swiftCore swift_Concurrency swiftGlibc swift_Builtin_float dispatch BlocksRuntime; do \
+        cp "/usr/lib/swift/linux/lib$lib.so" /runtime/usr/lib/swift/linux/; \
+    done && \
+    strip /runtime/usr/bin/assay && \
+    find /runtime/usr/lib -name '*.so' -exec strip --strip-unneeded {} +
 
 # ================================
 # Run image
@@ -38,14 +50,12 @@ RUN --mount=type=cache,target=/build/.build \
 
 FROM ${RUNTIME_IMAGE}
 
-# Copy the executable, resource bundles, and shared libraries
-COPY --from=build /assay-binary/assay /usr/bin/assay
-COPY --from=build /assay-resources /usr/bin/
-# SwiftLint loads SourceKit at runtime, which links the compiler's swift-syntax libraries; neither
-# ships in the slim image. Keep the toolchain layout so their $ORIGIN RUNPATHs resolve to the slim
-# image's own Swift runtime in /usr/lib/swift/linux.
-COPY --from=build /usr/lib/libsourcekitdInProc.so /usr/lib/
-COPY --from=build /usr/lib/swift/host/compiler/ /usr/lib/swift/host/compiler/
+# libcurl/libxml2: Foundation (linked statically into assay) still loads them dynamically.
+RUN export DEBIAN_FRONTEND=noninteractive && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends libcurl4t64 libxml2 ca-certificates tzdata && \
+    rm -rf /var/lib/apt/lists/*
 
-# Set entrypoint
+COPY --from=build /runtime/ /
+
 CMD ["assay"]
