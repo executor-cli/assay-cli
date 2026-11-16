@@ -19,6 +19,8 @@ BIN_NAME = "assay"
 # Make the install dir visible on PATH inside this project's mise environment,
 # so the freshly-installed binary resolves without touching your shell profile.
 _.path = ["{{ env.HOME }}/.local/bin"]
+# Ubuntu 26.04 runners lack libxml2.so.2, needed by the 24.04 Swift toolchain and executor.
+_.source = "scripts/linux-compat-libs.sh"
 
 [tasks.build]
 description = "Build the release binary"
@@ -84,7 +86,6 @@ if [[ "${usage_skip_ci:-}" == "false" ]]; then
     skip_ci_opt="--no-skip-ci"
 fi
 
-source scripts/executor-linux-libs.sh
 executor release package $dry_run_opt $enable_changelog_opt $enable_verbose_opt $skip_ci_opt --current-directory .
 '''
 
