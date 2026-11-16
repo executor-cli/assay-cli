@@ -28,6 +28,7 @@ jobs:
     if: ${{ !inputs.dry_run }}
     runs-on: ${{ matrix.runner }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - { arch: amd64, runner: ubuntu-latest }
