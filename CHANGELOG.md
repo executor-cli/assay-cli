@@ -1,3 +1,13 @@
+# [1.1.1](https://github.com/executor-cli/assay-cli/compare/1.1.0...1.1.1) (2026-11-16)
+
+
+## Bug Fixes
+
+
+* provide libxml2.so.2 for executor on Ubuntu 26.04 runners (#4) ([fc1d489](https://github.com/executor-cli/assay-cli/commit/fc1d489de53066becdad2c3ee93fe99bbd384581))
+* install libcurl dev package before static Linux link ([e140d8c](https://github.com/executor-cli/assay-cli/commit/e140d8c76e670c0383a34acaf1a060cc6a9f3e1c))
+
+
 # [1.1.0](https://github.com/executor-cli/assay-cli/compare/1.0.0...1.1.0) (2026-10-10)
 
 
