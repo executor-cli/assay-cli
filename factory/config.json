@@ -1,0 +1,121 @@
+{
+  "concurrency": 3,
+  "max_rounds": 3,
+  "base_branch": "main",
+  "merge_method": "squash",
+  "autonomous": false,
+  "labels": {
+    "queue": "factory",
+    "needs_info": "factory:needs-info",
+    "needs_human": "factory:needs-human",
+    "type_prefix": "type:",
+    "area_prefix": "area:"
+  },
+  "types": {
+    "feat": "New feature or capability",
+    "fix": "Bug fix",
+    "chore": "Maintenance with no production code change",
+    "refactor": "Code change that neither fixes a bug nor adds a feature",
+    "test": "Adding or correcting tests",
+    "perf": "Performance improvement",
+    "ci": "CI/CD pipeline or workflow change",
+    "docs": "Documentation only"
+  },
+  "areas": {
+    "cli": "assay command-line interface and its Kit modules",
+    "mobile-ios": "iOS app",
+    "mobile-android": "Android app",
+    "backend": "Backend / API service",
+    "frontend": "Public-facing web frontend",
+    "frontend-admin": "Admin / back-office web frontend",
+    "database": "Schema, migrations, queries",
+    "scripts": "Build, tooling or automation scripts",
+    "infra": "CI/CD, deploy, cloud or infrastructure config",
+    "design-system": "Shared UI tokens or components across platforms"
+  },
+  "routing": {
+    "low": {
+      "code": "haiku"
+    },
+    "medium": {
+      "code": "sonnet"
+    },
+    "high": {
+      "code": "sonnet"
+    }
+  },
+  "surface_reviewers": {
+    "ui": {
+      "ux": "sonnet",
+      "ui": "haiku"
+    },
+    "security": {
+      "security": "opus"
+    }
+  },
+  "models_gemini": {
+    "_comment": "Gemini CLI only: it can't pin a model per in-session subagent, so the orchestrator runs each stage as its own `gemini -m <model> -p` process instead. See SKILL.md's Agents section.",
+    "intake": "gemini-2.5-flash",
+    "spec_writer": "gemini-3-pro-preview",
+    "builder": "gemini-3-pro-preview",
+    "approver": "gemini-3-pro-preview",
+    "routing": {
+      "low": {
+        "code": "gemini-2.5-flash"
+      },
+      "medium": {
+        "code": "gemini-2.5-pro"
+      },
+      "high": {
+        "code": "gemini-2.5-pro"
+      }
+    },
+    "surface_reviewers": {
+      "ui": {
+        "ux": "gemini-2.5-pro",
+        "ui": "gemini-2.5-flash"
+      },
+      "security": {
+        "security": "gemini-3-pro-preview"
+      }
+    }
+  },
+  "protected_paths": [
+    "factory/checks.sh",
+    "factory/config.json"
+  ],
+  "ports": {
+    "base": 5100,
+    "step": 10
+  },
+  "prices_usd_per_mtok": {
+    "claude-fable-5-2": {
+      "input": 10.0,
+      "output": 50.0,
+      "cache_write_5m": 12.5,
+      "cache_write_1h": 20.0,
+      "cache_read": 0.25
+    },
+    "claude-opus-5-5": {
+      "input": 4.0,
+      "output": 20.0,
+      "cache_write_5m": 5.0,
+      "cache_write_1h": 8.0,
+      "cache_read": 0.2
+    },
+    "claude-sonnet-5-5": {
+      "input": 2.0,
+      "output": 10.0,
+      "cache_write_5m": 2.5,
+      "cache_write_1h": 4.0,
+      "cache_read": 0.2
+    },
+    "claude-haiku-5-5": {
+      "input": 0.1,
+      "output": 0.5,
+      "cache_write_5m": 0.125,
+      "cache_write_1h": 0.2,
+      "cache_read": 0.01
+    }
+  }
+}

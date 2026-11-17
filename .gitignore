@@ -13,3 +13,5 @@ mise.local.toml
 public
 *.log
 Combined.doccarchive
+/factory/jobs/
+/.worktrees/
