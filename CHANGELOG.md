@@ -1,3 +1,12 @@
+# [1.1.2](https://github.com/executor-cli/assay-cli/compare/1.1.1...1.1.2) (2026-11-17)
+
+
+## Bug Fixes
+
+
+* make the image job fit on the runner and shrink the image to 434 MB (#5) ([a1ae4e6](https://github.com/executor-cli/assay-cli/commit/a1ae4e656b69ab6dc6db48e0a99e25dda3b43f37))
+
+
 # [1.1.1](https://github.com/executor-cli/assay-cli/compare/1.1.0...1.1.1) (2026-11-16)
 
 
