@@ -35,6 +35,11 @@ let package = Package(
         .package(
             url: "https://github.com/apple/swift-nio-ssl",
             from: "2.36.0"
+        ),
+        // swift-index-store uses unsafeFlags, so the fork can only be pinned by revision (tag 3.9.1).
+        .package(
+            url: "https://github.com/executor-cli/periphery",
+            revision: "35987082581998e6dc4f4b0122f403e44a5697fb"
         )
     ],
     targets: [
@@ -71,6 +76,7 @@ let package = Package(
             name: "AssayCLI",
             dependencies: [
                 .target(name: "App"),
+                .target(name: "DeadCodeKit"),
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Path", package: "Path")
             ],
@@ -83,6 +89,24 @@ let package = Package(
             dependencies: ["AssayCLI"],
             swiftSettings: [
                 .enableUpcomingFeature("ApproachableConcurrency")
+            ]
+        ),
+        .target(
+            name: "DeadCodeKit",
+            dependencies: [
+                .target(name: "AppCore"),
+                .target(name: "LinterKit"),
+                .product(name: "PeripheryKit", package: "periphery", condition: .when(platforms: [.macOS]))
+            ],
+            swiftSettings: [
+                .swiftLanguageMode(.v5)
+            ]
+        ),
+        .testTarget(
+            name: "DeadCodeKitTests",
+            dependencies: [
+                .target(name: "DeadCodeKit"),
+                .target(name: "LinterKit")
             ]
         ),
         .target(

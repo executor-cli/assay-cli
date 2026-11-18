@@ -1,6 +1,6 @@
 # assay
 
-A small Swift CLI that formats and lints Swift code, built on [SwiftFormat](https://github.com/nicklockwood/SwiftFormat) and [SwiftLint](https://github.com/realm/SwiftLint) as libraries (no separate binaries needed).
+A small Swift CLI that formats and lints Swift code, built on [SwiftFormat](https://github.com/nicklockwood/SwiftFormat) and [SwiftLint](https://github.com/realm/SwiftLint) as libraries (no separate binaries needed). On macOS it also finds unused code with [Periphery](https://github.com/executor-cli/periphery).
 
 ## Usage
 
@@ -8,11 +8,13 @@ A small Swift CLI that formats and lints Swift code, built on [SwiftFormat](http
 assay format <paths> [--exclude <name-or-path> ...]
 assay linter code <paths> [--reporter console|json|code-quality] [--exclude ...] [--config-file .swiftlint.yml] [--throw-error]
 assay linter documentation <paths> [--reporter ...] [--exclude ...]
+assay deadcode [<path>] [--reporter ...] [--exclude ...]   # macOS only
 ```
 
 - `format` applies a fixed SwiftFormat rule set to the given files or folders.
 - `linter code` runs SwiftLint with the bundled `com.raywenderlich.swiftlint.yml`, or your own file via `--config-file`.
 - `linter documentation` checks missing doc comments (`missing_docs` rule).
+- `deadcode` (macOS only) builds the SwiftPM package at `<path>` (default: current directory) and reports unused code found by Periphery. It exits non-zero when it finds any.
 - `code-quality` reports are GitLab Code Quality JSON, written to `--report-path` (default: current directory).
 - Relative paths such as `.` are resolved against the current directory.
 
@@ -23,6 +25,8 @@ Excluded folders are the union of:
 1. the configured defaults (`.build`, `DerivedData`, `Carthage`, `Pods`),
 2. every `--exclude` flag,
 3. the `excluded` entries of the SwiftLint config in use (linter only).
+
+`deadcode` applies items 1 and 2.
 
 An entry without `/` matches any folder name; an entry with `/` matches as a path fragment.
 
@@ -53,6 +57,7 @@ linter:
 | `AppCore` / `AppConfiguration` | Configuration types and their loader |
 | `FormatKit` | SwiftFormat service |
 | `LinterKit` | SwiftLint service, runners and report formatters |
+| `DeadCodeKit` | Periphery scan (macOS only) and mapping to the report formatters |
 
 ## Build and run
 
