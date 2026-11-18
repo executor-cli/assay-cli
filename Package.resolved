@@ -1,6 +1,15 @@
 {
-  "originHash" : "bae45792598e30bf5183c77905c85381567d85a6a159f0b206980a79ee8a4b74",
+  "originHash" : "a6565bf969d94156cd8b0b24da89db5184c347e8035150a70bcad813d5b5703c",
   "pins" : [
+    {
+      "identity" : "aexml",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tadija/AEXML",
+      "state" : {
+        "revision" : "d2083adcf4d1383c858f5d3d0f24256459d3f59a",
+        "version" : "4.7.4"
+      }
+    },
     {
       "identity" : "cascade-kit",
       "kind" : "remoteSourceControl",
@@ -38,12 +47,38 @@
       }
     },
     {
+      "identity" : "pathkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kylef/PathKit.git",
+      "state" : {
+        "revision" : "3bfd2737b700b9a36565a8c94f4ad2b050a5e574",
+        "version" : "1.0.1"
+      }
+    },
+    {
+      "identity" : "periphery",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/executor-cli/periphery",
+      "state" : {
+        "revision" : "35987082581998e6dc4f4b0122f403e44a5697fb"
+      }
+    },
+    {
       "identity" : "sourcekitten",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jpsim/SourceKitten.git",
       "state" : {
         "revision" : "1cde6e9fb78e64f9b9d38c4992cac4f071d7eb63",
         "version" : "0.39.0"
+      }
+    },
+    {
+      "identity" : "spectre",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kylef/Spectre.git",
+      "state" : {
+        "revision" : "26cc5e9ae0947092c7139ef7ba612e34646086c7",
+        "version" : "0.10.1"
       }
     },
     {
@@ -98,6 +133,14 @@
       "state" : {
         "revision" : "eef5ac0b6b3cdc64b3039b037bed2def8a1edaeb",
         "version" : "2.0.1"
+      }
+    },
+    {
+      "identity" : "swift-index-store",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ileitch/swift-index-store",
+      "state" : {
+        "revision" : "ed1f232d33b8e03956af0f4206fbd30171a43138"
       }
     },
     {
@@ -188,6 +231,24 @@
       "state" : {
         "revision" : "a853604c9e9a83ad9954c7e3d2a565273982471f",
         "version" : "7.0.2"
+      }
+    },
+    {
+      "identity" : "xcode-project-format",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/xcode-project-format.git",
+      "state" : {
+        "revision" : "c132630aabf40f6d6c3f7bb004595d2e5a28ea42",
+        "version" : "0.1.0"
+      }
+    },
+    {
+      "identity" : "xcodeproj",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tuist/xcodeproj",
+      "state" : {
+        "revision" : "a97494b14b5ba3184b48c050d034c7534356e0ae",
+        "version" : "9.17.8"
       }
     },
     {

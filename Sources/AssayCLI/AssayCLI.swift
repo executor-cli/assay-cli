@@ -17,10 +17,15 @@ struct AssayCLI: AsyncParsableCommand {
             commandName: "assay",
             abstract: "A assay helper usable as a CLI.",
             version: appVersion,
-            subcommands: [
-                FormatCommand.self,
-                LinterCommand.self
-            ]
+            subcommands: subcommands
         )
+    }
+
+    private static var subcommands: [any ParsableCommand.Type] {
+#if os(macOS)
+        [FormatCommand.self, LinterCommand.self, DeadCodeCommand.self]
+#else
+        [FormatCommand.self, LinterCommand.self]
+#endif
     }
 }
