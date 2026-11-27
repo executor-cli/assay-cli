@@ -1,3 +1,13 @@
+# [1.1.3](https://github.com/executor-cli/assay-cli/compare/1.1.2...1.1.3) (2026-11-27)
+
+
+## Bug Fixes
+
+
+* install git in the Docker image (#11) ([92e2e55](https://github.com/executor-cli/assay-cli/commit/92e2e55f88af089e31f8333b4edb2f6b5bca3a7e))
+* filter generated documentation to keep only assay (#10) ([3156da4](https://github.com/executor-cli/assay-cli/commit/3156da4d9c68a22fa39f99475cca5b3d35ed6acf))
+
+
 # [1.1.2](https://github.com/executor-cli/assay-cli/compare/1.1.1...1.1.2) (2026-11-17)
 
 
