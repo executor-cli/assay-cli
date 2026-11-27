@@ -14,6 +14,8 @@ docker run --rm -v "$PWD":/work -w /work ghcr.io/executor-cli/assay-cli:latest a
 
 Tags follow the release version: `1.2.6`, `1.2`, `1` and `latest`.
 
+The image includes `git`.
+
 ## From source
 
 Requires macOS 15 or later (or Linux) and Swift 6.3 or later.
