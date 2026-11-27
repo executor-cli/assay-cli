@@ -53,7 +53,7 @@ FROM ${RUNTIME_IMAGE}
 # libcurl/libxml2: Foundation (linked statically into assay) still loads them dynamically.
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
-    apt-get install -y --no-install-recommends libcurl4t64 libxml2 ca-certificates tzdata && \
+    apt-get install -y --no-install-recommends libcurl4t64 libxml2 ca-certificates tzdata git && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /runtime/ /
