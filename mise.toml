@@ -168,6 +168,7 @@ executor xcodebuild docc\
     --platform "${usage_platform?}"\
     --hosting-base-path "${usage_hosting_base_path?}"\
     --output-path "public"\
+    --filter-scheme "assay"\
     --verbose
 if [[ "${usage_serve:-}" == "true" ]]; then
     python3 -m http.server -d public
